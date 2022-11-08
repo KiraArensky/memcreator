@@ -15,7 +15,7 @@ except:
     from PIL.ImageQt import ImageQt
     from PIL import Image, ImageDraw, ImageFont
 
-from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QFileDialog, QMessageBox
+from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QFileDialog, QMessageBox, QSlider
 from PyQt5.QtGui import QPixmap
 from PyQt5 import QtCore
 from PyQt5.QtWidgets import QInputDialog
@@ -56,6 +56,10 @@ class Osnova(QMainWindow):
         self.flag = True
         self.flag_1 = True
         self.flag_deistv = True
+        self.povorot.valueChanged[int].connect(self.changeValue)
+        self.size_text = 18
+        self.povorot_2.valueChanged[int].connect(self.changeValue)
+        self.size_pic = 40
 
     def flgok(self):
         self.flag = True
@@ -69,7 +73,6 @@ class Osnova(QMainWindow):
             None
 
     def mousePressEvent(self, event):
-        self.coords.setText(f'{event.x()}, {event.y()}')
         self.x1 = event.x()
         self.y1 = event.y()
         if self.flag is False:
@@ -124,17 +127,25 @@ class Osnova(QMainWindow):
             self.fname_1 = QFileDialog.getOpenFileName(self, 'Выбрать картинку', '')[0]
             self.flag_ok.show()
             self.sohranit.hide()
+            self.vstav_pic()
         else:
             QMessageBox.critical(self, "Ой, ошибка ", "Ты забыл закончить предыдущее действие, бака", QMessageBox.Ok)
 
+    def changeValue(self, value):
+        if self.flag is False:
+            self.size_text = (value + 1) * 4
+            self.vstav_text()
+        if self.flag_1 is False:
+            self.size_pic = (value + 1) * 4
+            self.vstav_pic()
+
     def vstav_text(self):
         if self.ok_pressed:
-            self.coords.setText(self.text_mem)
             try:
                 self.flag_deistv = False
                 self.nazd = self.img.copy()
                 name = self.text_mem
-                self.font = ImageFont.truetype('Arial.ttf', size=18)
+                self.font = ImageFont.truetype('Arial.ttf', size=self.size_text)
                 self.draw_text = ImageDraw.Draw(self.nazd)
                 x = self.x1 - 30
                 y = self.y1 - 30 - ((400 - self.height) // 2)
@@ -171,9 +182,8 @@ class Osnova(QMainWindow):
             self.flag_deistv = False
             self.nazd = self.img.copy()
             self.pic = Image.open(self.fname_1)
-            self.size_1 = 50, 50
+            self.size_1 = self.size_pic, self.size_pic
             self.pic.thumbnail(self.size_1)
-            self.vstav_pic()
             x = self.x1 - 30
             y = self.y1 - 30 - ((400 - self.height) // 2)
             coord = (x, y)

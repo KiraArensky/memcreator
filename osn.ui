@@ -177,19 +177,6 @@ p, li { white-space: pre-wrap; }
      <enum>Qt::Horizontal</enum>
     </property>
    </widget>
-   <widget class="QPushButton" name="shrift">
-    <property name="geometry">
-     <rect>
-      <x>540</x>
-      <y>140</y>
-      <width>90</width>
-      <height>30</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Шрифт</string>
-    </property>
-   </widget>
    <widget class="QSpinBox" name="spinBox">
     <property name="geometry">
      <rect>
@@ -250,6 +237,16 @@ p, li { white-space: pre-wrap; }
     </property>
     <property name="text">
      <string>Вставить текст</string>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="shrift">
+    <property name="geometry">
+     <rect>
+      <x>540</x>
+      <y>140</y>
+      <width>90</width>
+      <height>30</height>
+     </rect>
     </property>
    </widget>
   </widget>
