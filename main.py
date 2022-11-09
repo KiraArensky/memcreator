@@ -64,6 +64,8 @@ class Osnova(QMainWindow):
         self.grds_pic = 0
         self.gradus_2.valueChanged[int].connect(self.sliderMoved_1)
         self.grds_txt = 0
+        self.prozrach.valueChanged.connect(self.prozr)
+        self.przr = 255
 
     def flgok(self):
         self.flag = True
@@ -88,12 +90,12 @@ class Osnova(QMainWindow):
         nazv, ok = QInputDialog.getText(self, "Имя файла",
                                         "Как назвать файл?")
         try:
-            self.sizezz = 1200, 1200
-            self.img.thumbnail(self.sizezz)
             if nazv:
-                self.img.save(f'{nazv}.jpg')
+                sizezz = 1000, 1000
+                self.img.thumbnail(sizezz)
+                self.img.save(f'{nazv}.png')
             else:
-                self.img.save('Вы_не_ввели_название.jpg')
+                self.img.save('Вы_не_ввели_название.png')
             self.img.thumbnail(self.size)
         except:
             _translate = QtCore.QCoreApplication.translate
@@ -106,7 +108,7 @@ class Osnova(QMainWindow):
             self.fname = QFileDialog.getOpenFileName(self, 'Выбрать картинку', '')[0]
             self.img = Image.open(self.fname)
             self.size = 400, 400
-            self.img.thumbnail(self.size)
+            self.img.thumbnail(self.size, Image.Resampling.LANCZOS)
             self.width, self.height = self.img.size
             self.a = ImageQt(self.img)
             self.pixmap = QPixmap.fromImage(self.a)
@@ -124,23 +126,10 @@ class Osnova(QMainWindow):
         else:
             QMessageBox.critical(self, "Ой, ошибка ", "Ты забыл закончить предыдущее действие, бака", QMessageBox.Ok)
 
-    def spros_pic(self):
-        if self.flag_deistv:
-            self.fname_1 = QFileDialog.getOpenFileName(self, 'Выбрать картинку', '')[0]
-            self.vstav_pic()
-        else:
-            QMessageBox.critical(self, "Ой, ошибка ", "Ты забыл закончить предыдущее действие, бака", QMessageBox.Ok)
-
     def changeValue(self, value):
         if self.flag is False:
             self.size_text = (value + 1) * 4
             self.vstav_text()
-
-
-    def changeValue_1(self, value):
-        if self.flag_1 is False:
-            self.size_pic = (value + 1) * 4
-            self.vstav_pic()
 
     def sliderMoved_1(self):
         if self.flag is False:
@@ -191,9 +180,26 @@ class Osnova(QMainWindow):
                                               "<html><head/><body><p align=\"center\"><span style=\" font-size:12pt; \
                                                font-weight:600;\">Вы не выбрали картинку!</span></p></body></html>"))
 
+    def spros_pic(self):
+        if self.flag_deistv:
+            self.fname_1 = QFileDialog.getOpenFileName(self, 'Выбрать картинку', '')[0]
+            self.vstav_pic()
+        else:
+            QMessageBox.critical(self, "Ой, ошибка ", "Ты забыл закончить предыдущее действие, бака", QMessageBox.Ok)
+
+    def changeValue_1(self, value):
+        if self.flag_1 is False:
+            self.size_pic = (value + 1) * 4
+            self.vstav_pic()
+
     def sliderMoved(self):
         if self.flag_1 is False:
             self.grds_pic = 360 - int(self.gradus.value())
+            self.vstav_pic()
+
+    def prozr(self):
+        if self.flag_1 is False:
+            self.przr = int(self.prozrach.value())
             self.vstav_pic()
 
     def vstav_pic(self):
@@ -202,14 +208,27 @@ class Osnova(QMainWindow):
             self.pic = Image.open(self.fname_1)
             self.size_1 = self.size_pic, self.size_pic
             self.pic.thumbnail(self.size_1)
-            self.pic = self.pic.rotate(self.grds_pic, resample=Image.Resampling.BICUBIC, expand=True).resize(self.size_1)
+            self.pic = self.pic.rotate(self.grds_pic, resample=Image.Resampling.BICUBIC, expand=True,
+                                       fillcolor=(0, 0, 255))
+            rgba = self.pic.convert("RGBA")
+            dat = rgba.getdata()
+            newData = []
+            for item in dat:
+                if item[0] == 0 and item[1] == 0 and item[2] == 255:
+                    newData.append((255, 255, 255, 0))
+                else:
+                    newData.append(item)
+            rgba.putdata(newData)
+            rgba.save("transparent_image.png", "PNG")
+            self.pic = Image.open('transparent_image.png' , 'r')
+            print(self.przr)
             width, height = self.pic.size
             x = self.x1 - 30 - (width // 2)
             y = self.y1 - 30 - ((400 - self.height) // 2) - (height // 2)
             coord = (x, y)
             self.flag_ok.show()
             self.sohranit.hide()
-            self.nazd.paste(self.pic, coord)
+            self.nazd.paste(self.pic, coord, mask=self.pic)
             self.a = ImageQt(self.nazd)
             self.pixmap = QPixmap.fromImage(self.a)
             self.label.setPixmap(self.pixmap)
