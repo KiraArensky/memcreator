@@ -66,6 +66,12 @@ class Osnova(QMainWindow):
         self.grds_txt = 0
         self.prozrach.valueChanged.connect(self.prozr)
         self.przr = 255
+        self.combbox()
+        self.shrift.currentTextChanged.connect(self.srft_changed)
+        self.shrft = 'Arial'
+
+    def combbox(self):
+        self.shrift.addItems(['Arial', 'Astakhov_First_Simple', 'Impact'])
 
     def flgok(self):
         self.flag = True
@@ -136,12 +142,17 @@ class Osnova(QMainWindow):
             self.grds_txt = 360 - int(self.gradus_2.value())
             self.vstav_text()
 
+    def srft_changed(self, ):
+        if self.flag is False:
+            self.shrft = self.shrift.currentText()
+            self.vstav_text()
+
     def vstav_text(self):
         if self.ok_pressed:
             try:
                 self.nazd = self.img.copy()
                 name = self.text_mem
-                self.font = ImageFont.truetype('Arial.ttf', size=self.size_text)
+                self.font = ImageFont.truetype(f'{self.shrft}.ttf', size=self.size_text)
                 line_height = sum(self.font.getmetrics())
                 fontimage = Image.new('L', (self.font.getsize(name)[0], line_height))
                 ImageDraw.Draw(fontimage).text((0, 0), name, fill=255, font=self.font)
