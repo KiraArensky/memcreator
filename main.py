@@ -217,11 +217,10 @@ class Osnova(QMainWindow):
                 if item[0] == 0 and item[1] == 0 and item[2] == 255:
                     newData.append((255, 255, 255, 0))
                 else:
-                    newData.append(item)
+                    newData.append((item[0], item[1], item[2], self.przr))
             rgba.putdata(newData)
             rgba.save("transparent_image.png", "PNG")
-            self.pic = Image.open('transparent_image.png' , 'r')
-            print(self.przr)
+            self.pic = Image.open('transparent_image.png', 'r')
             width, height = self.pic.size
             x = self.x1 - 30 - (width // 2)
             y = self.y1 - 30 - ((400 - self.height) // 2) - (height // 2)
