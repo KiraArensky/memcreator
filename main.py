@@ -258,6 +258,12 @@ class Osnova(QMainWindow):
     def mem_zagolovok(self):
         if self.flag_deistv:
             self.zag_ramk, self.oye = QInputDialog.getText(self, "Введите заголовок", "пиши")
+            if len(self.zag_ramk) > 20:
+                n = len(self.zag_ramk) // 20 + 1
+                lst = []
+                for i in range(n):
+                    lst.append(self.zag_ramk[i * 20:(i + 1) * 20])
+                self.zag_ramk = '\n'.join(lst)
             self.mem_text()
         else:
             QMessageBox.critical(self, "Ой, ошибка ", "Ты забыл закончить предыдущее действие, бака", QMessageBox.Ok)
@@ -271,24 +277,23 @@ class Osnova(QMainWindow):
 
     def mem_ramka(self):
         try:
-            self.ramka = Image.new('RGBA', (self.width + 50, self.height + 150), 'black')
-            idraw = ImageDraw.Draw(self.ramka)
-            idraw.rectangle((20, 20, self.width + 30, self.height + 30), fill='white')
-            idraw.rectangle((23, 23, self.width + 27, self.height + 27), fill='black')
-
             font = ImageFont.truetype(f'Times_new_roman.ttf', size=50)
             line_height1 = sum(font.getmetrics())
             fontimage1 = Image.new('L', (font.getsize(self.zag_ramk)[0], line_height1))
             x, y = fontimage1.size
             ImageDraw.Draw(fontimage1).text((0, 0), self.zag_ramk, fill=255, font=font)
-            self.ramka.paste((255, 255, 255), ((self.width + 50 - x) // 2, (self.height + 40)),
-                             mask=fontimage1)
             font1 = ImageFont.truetype(f'Arial.ttf', size=20)
             line_height = sum(font1.getmetrics())
             fontimage = Image.new('L', (font1.getsize(self.text_ramk)[0], line_height))
-            x, y = fontimage.size
+            x1, y1 = fontimage.size
             ImageDraw.Draw(fontimage).text((0, 0), self.text_ramk, fill=255, font=font1)
-            self.ramka.paste((255, 255, 255), ((self.width + 50 - x) // 2, (self.height + 130 - y)),
+            self.ramka = Image.new('RGBA', (self.width + 50, self.height + 10 + y + 15 + y1 + 40), 'black')
+            idraw = ImageDraw.Draw(self.ramka)
+            idraw.rectangle((20, 20, self.width + 30, self.height + 30), fill='white')
+            idraw.rectangle((23, 23, self.width + 27, self.height + 27), fill='black')
+            self.ramka.paste((255, 255, 255), ((self.width + 50 - x) // 2, (self.height + 40)),
+                             mask=fontimage1)
+            self.ramka.paste((255, 255, 255), ((self.width + 50 - x1) // 2, (self.height + 40 + y + 10)),
                              mask=fontimage)
             self.ramka.paste(self.img, (25, 25))
             self.ramka.thumbnail(self.size, Image.Resampling.LANCZOS)
