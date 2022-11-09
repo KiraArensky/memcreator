@@ -56,10 +56,12 @@ class Osnova(QMainWindow):
         self.flag = True
         self.flag_1 = True
         self.flag_deistv = True
-        self.povorot.valueChanged[int].connect(self.changeValue)
+        self.razmer.valueChanged[int].connect(self.changeValue)
         self.size_text = 18
-        self.povorot_2.valueChanged[int].connect(self.changeValue)
+        self.razmer_2.valueChanged[int].connect(self.changeValue_1)
         self.size_pic = 40
+        self.gradus.valueChanged[int].connect(self.sliderMoved)
+        self.grds_pic = 0
 
     def flgok(self):
         self.flag = True
@@ -116,8 +118,6 @@ class Osnova(QMainWindow):
     def spros_text(self):
         if self.flag_deistv:
             self.text_mem, self.ok_pressed = QInputDialog.getText(self, "Текст", "Введите текст")
-            self.flag_ok.show()
-            self.sohranit.hide()
             self.vstav_text()
         else:
             QMessageBox.critical(self, "Ой, ошибка ", "Ты забыл закончить предыдущее действие, бака", QMessageBox.Ok)
@@ -125,8 +125,6 @@ class Osnova(QMainWindow):
     def spros_pic(self):
         if self.flag_deistv:
             self.fname_1 = QFileDialog.getOpenFileName(self, 'Выбрать картинку', '')[0]
-            self.flag_ok.show()
-            self.sohranit.hide()
             self.vstav_pic()
         else:
             QMessageBox.critical(self, "Ой, ошибка ", "Ты забыл закончить предыдущее действие, бака", QMessageBox.Ok)
@@ -135,6 +133,9 @@ class Osnova(QMainWindow):
         if self.flag is False:
             self.size_text = (value + 1) * 4
             self.vstav_text()
+
+
+    def changeValue_1(self, value):
         if self.flag_1 is False:
             self.size_pic = (value + 1) * 4
             self.vstav_pic()
@@ -142,13 +143,14 @@ class Osnova(QMainWindow):
     def vstav_text(self):
         if self.ok_pressed:
             try:
-                self.flag_deistv = False
                 self.nazd = self.img.copy()
                 name = self.text_mem
                 self.font = ImageFont.truetype('Arial.ttf', size=self.size_text)
                 self.draw_text = ImageDraw.Draw(self.nazd)
                 x = self.x1 - 30
                 y = self.y1 - 30 - ((400 - self.height) // 2)
+                self.flag_ok.show()
+                self.sohranit.hide()
                 for off in range(3):
                     # move right
                     self.draw_text.text((x - off, y), name, font=self.font, fill='black')
@@ -171,27 +173,37 @@ class Osnova(QMainWindow):
                 self.pixmap = QPixmap.fromImage(self.a)
                 self.label.setPixmap(self.pixmap)
                 self.flag = False
+                self.flag_deistv = False
             except:
                 _translate = QtCore.QCoreApplication.translate
                 self.label.setText(_translate("MainWindow",
                                               "<html><head/><body><p align=\"center\"><span style=\" font-size:12pt; \
                                                font-weight:600;\">Вы не выбрали картинку!</span></p></body></html>"))
 
+    def sliderMoved(self):
+        if self.flag_1 is False:
+            self.grds_pic = 360 - int(self.gradus.value())
+            self.vstav_pic()
+
     def vstav_pic(self):
         try:
-            self.flag_deistv = False
             self.nazd = self.img.copy()
             self.pic = Image.open(self.fname_1)
             self.size_1 = self.size_pic, self.size_pic
             self.pic.thumbnail(self.size_1)
-            x = self.x1 - 30
-            y = self.y1 - 30 - ((400 - self.height) // 2)
+            self.pic = self.pic.rotate(self.grds_pic, resample=Image.Resampling.BICUBIC, expand=True).resize(self.size_1)
+            width, height = self.pic.size
+            x = self.x1 - 30 - (width // 2)
+            y = self.y1 - 30 - ((400 - self.height) // 2) - (height // 2)
             coord = (x, y)
+            self.flag_ok.show()
+            self.sohranit.hide()
             self.nazd.paste(self.pic, coord)
             self.a = ImageQt(self.nazd)
             self.pixmap = QPixmap.fromImage(self.a)
             self.label.setPixmap(self.pixmap)
             self.flag_1 = False
+            self.flag_deistv = False
         except:
             _translate = QtCore.QCoreApplication.translate
             self.label.setText(_translate("MainWindow",
