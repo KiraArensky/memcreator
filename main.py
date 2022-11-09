@@ -62,6 +62,8 @@ class Osnova(QMainWindow):
         self.size_pic = 40
         self.gradus.valueChanged[int].connect(self.sliderMoved)
         self.grds_pic = 0
+        self.gradus_2.valueChanged[int].connect(self.sliderMoved_1)
+        self.grds_txt = 0
 
     def flgok(self):
         self.flag = True
@@ -140,35 +142,44 @@ class Osnova(QMainWindow):
             self.size_pic = (value + 1) * 4
             self.vstav_pic()
 
+    def sliderMoved_1(self):
+        if self.flag is False:
+            self.grds_txt = 360 - int(self.gradus_2.value())
+            self.vstav_text()
+
     def vstav_text(self):
         if self.ok_pressed:
             try:
                 self.nazd = self.img.copy()
                 name = self.text_mem
                 self.font = ImageFont.truetype('Arial.ttf', size=self.size_text)
+                line_height = sum(self.font.getmetrics())
+                fontimage = Image.new('L', (self.font.getsize(name)[0], line_height))
+                ImageDraw.Draw(fontimage).text((0, 0), name, fill=255, font=self.font)
                 self.draw_text = ImageDraw.Draw(self.nazd)
+                fontimage = fontimage.rotate(self.grds_txt, resample=Image.BICUBIC, expand=True)
                 x = self.x1 - 30
                 y = self.y1 - 30 - ((400 - self.height) // 2)
                 self.flag_ok.show()
                 self.sohranit.hide()
-                for off in range(3):
+                for i in range(3):
                     # move right
-                    self.draw_text.text((x - off, y), name, font=self.font, fill='black')
+                    self.nazd.paste((0, 0, 0), (x - i, y), mask=fontimage)
                     # move left
-                    self.draw_text.text((x + off, y), name, font=self.font, fill='black')
+                    self.nazd.paste((0, 0, 0), (x + i, y), mask=fontimage)
                     # move up
-                    self.draw_text.text((x, y + off), name, font=self.font, fill='black')
+                    self.nazd.paste((0, 0, 0), (x, y + i), mask=fontimage)
                     # move down
-                    self.draw_text.text((x, y - off), name, font=self.font, fill='black')
+                    self.nazd.paste((0, 0, 0), (x, y - i), mask=fontimage)
                     # diagnal left up
-                    self.draw_text.text((x - off, y + off), name, font=self.font, fill='black')
+                    self.nazd.paste((0, 0, 0), (x - i, y + i), mask=fontimage)
                     # diagnal right up
-                    self.draw_text.text((x + off, y + off), name, font=self.font, fill='black')
+                    self.nazd.paste((0, 0, 0), (x + i, y + i), mask=fontimage)
                     # diagnal left down
-                    self.draw_text.text((x - off, y - off), name, font=self.font, fill='black')
+                    self.nazd.paste((0, 0, 0), (x - i, y - i), mask=fontimage)
                     # diagnal right down
-                    self.draw_text.text((x + off, y - off), name, font=self.font, fill='black')
-                self.draw_text.text((x, y), name, font=self.font, fill='white')
+                    self.nazd.paste((0, 0, 0), (x + i, y - i), mask=fontimage)
+                self.nazd.paste((255, 255, 255), (x, y), mask=fontimage)
                 self.a = ImageQt(self.nazd)
                 self.pixmap = QPixmap.fromImage(self.a)
                 self.label.setPixmap(self.pixmap)

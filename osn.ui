@@ -224,8 +224,14 @@
       <height>64</height>
      </rect>
     </property>
+    <property name="minimum">
+     <number>0</number>
+    </property>
     <property name="maximum">
      <number>360</number>
+    </property>
+    <property name="singleStep">
+     <number>1</number>
     </property>
     <property name="orientation">
      <enum>Qt::Horizontal</enum>
@@ -239,6 +245,9 @@
       <width>50</width>
       <height>64</height>
      </rect>
+    </property>
+    <property name="maximum">
+     <number>360</number>
     </property>
    </widget>
   </widget>
