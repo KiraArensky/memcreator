@@ -1,4 +1,5 @@
 import sys
+import os
 from os import system
 
 try:
@@ -20,19 +21,37 @@ from PyQt5.QtGui import QPixmap
 from PyQt5 import QtCore
 from PyQt5.QtWidgets import QInputDialog
 
+class Registr(QWidget):
+    def __init__(self):
+        super().__init__()
+        uic.loadUi('designs/regg.ui', self)
+
+class Loginn(QWidget):
+    def __init__(self):
+        super().__init__()
+        uic.loadUi('designs/log.ui', self)
+        self.osnv = Osnova()
+        self.regist.clicked.connect(self.yep)
+        self.voity.clicked.connect(self.yep)
+
+    def yep(self):
+        self.osnv.show()
+        lognn = Loginn()
+        lognn.close
+
 
 class Kek(QWidget):
     def __init__(self):
         super().__init__()
-        uic.loadUi('vkl.ui', self)
+        uic.loadUi('designs/vkl.ui', self)
 
 
 class Shbln(QWidget):
     def __init__(self):
         super().__init__()
-        uic.loadUi('sbl.ui', self)
+        uic.loadUi('designs/sbl.ui', self)
 
-        self.x = Image.open('3.jpg')
+        self.x = Image.open('sbln/3.jpg')
         self.size = 150, 150
         self.x.thumbnail(self.size)
         self.a = ImageQt(self.x)
@@ -43,7 +62,7 @@ class Shbln(QWidget):
 class Osnova(QMainWindow):
     def __init__(self):
         super().__init__()
-        uic.loadUi('osn.ui', self)  # Загружаем дизайн
+        uic.loadUi('designs/osn.ui', self)  # Загружаем дизайн
         self.kartinka.clicked.connect(self.yo)
         self.bibl.clicked.connect(self.show_sbl)
         self.vst_text.clicked.connect(self.spros_text)
@@ -104,7 +123,7 @@ class Osnova(QMainWindow):
             sizezz = 1000, 1000
             self.img.resize(sizezz, Image.Resampling.LANCZOS)
             if nazv:
-                self.img.save(f'{nazv}.png')
+                self.img.save(f'mem/{nazv}.png')
             else:
                 self.img.save('Вы_не_ввели_название.png')
             self.img.thumbnail(self.size)
@@ -157,7 +176,7 @@ class Osnova(QMainWindow):
             try:
                 self.nazd = self.img.copy()
                 name = self.text_mem
-                self.font = ImageFont.truetype(f'{self.shrft}.ttf', size=self.size_text)
+                self.font = ImageFont.truetype(f'shrifts/{self.shrft}.ttf', size=self.size_text)
                 line_height = sum(self.font.getmetrics())
                 fontimage = Image.new('L', (self.font.getsize(name)[0], line_height))
                 x, y = fontimage.size
@@ -235,8 +254,8 @@ class Osnova(QMainWindow):
                 else:
                     newData.append((item[0], item[1], item[2], self.przr))
             rgba.putdata(newData)
-            rgba.save("transparent_image.png", "PNG")
-            self.pic = Image.open('transparent_image.png', 'r')
+            rgba.save("rabochka/transparent_image.png", "PNG")
+            self.pic = Image.open('rabochka/transparent_image.png', 'r')
             width, height = self.pic.size
             x = self.x1 - 30 - (width // 2)
             y = self.y1 - 30 - ((400 - self.height) // 2) - (height // 2)
@@ -249,6 +268,7 @@ class Osnova(QMainWindow):
             self.label.setPixmap(self.pixmap)
             self.flag_1 = False
             self.flag_deistv = False
+            os.remove("rabochka/transparent_image.png")
         except:
             _translate = QtCore.QCoreApplication.translate
             self.label.setText(_translate("MainWindow",
@@ -277,12 +297,12 @@ class Osnova(QMainWindow):
 
     def mem_ramka(self):
         try:
-            font = ImageFont.truetype(f'Times_new_roman.ttf', size=50)
+            font = ImageFont.truetype(f'shrifts/Times_new_roman.ttf', size=50)
             line_height1 = sum(font.getmetrics())
             fontimage1 = Image.new('L', (font.getsize(self.zag_ramk)[0], line_height1))
             x, y = fontimage1.size
             ImageDraw.Draw(fontimage1).text((0, 0), self.zag_ramk, fill=255, font=font)
-            font1 = ImageFont.truetype(f'Arial.ttf', size=20)
+            font1 = ImageFont.truetype(f'shrifts/Arial.ttf', size=20)
             line_height = sum(font1.getmetrics())
             fontimage = Image.new('L', (font1.getsize(self.text_ramk)[0], line_height))
             x1, y1 = fontimage.size
@@ -322,7 +342,7 @@ class Osnova(QMainWindow):
         self.w.show()
 
     def mem(self):
-        self.osn = Osnova()
+        self.osn = Loginn()
         self.osn.show()
 
 
