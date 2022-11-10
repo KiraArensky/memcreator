@@ -1,6 +1,7 @@
 import sys
 import os
 from os import system
+import sqlite3
 
 try:
     from PyQt5 import uic
@@ -16,28 +17,10 @@ except:
     from PIL.ImageQt import ImageQt
     from PIL import Image, ImageDraw, ImageFont
 
-from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QFileDialog, QMessageBox, QSlider
+from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QFileDialog, QMessageBox
 from PyQt5.QtGui import QPixmap
 from PyQt5 import QtCore
 from PyQt5.QtWidgets import QInputDialog
-
-class Registr(QWidget):
-    def __init__(self):
-        super().__init__()
-        uic.loadUi('designs/regg.ui', self)
-
-class Loginn(QWidget):
-    def __init__(self):
-        super().__init__()
-        uic.loadUi('designs/log.ui', self)
-        self.osnv = Osnova()
-        self.regist.clicked.connect(self.yep)
-        self.voity.clicked.connect(self.yep)
-
-    def yep(self):
-        self.osnv.show()
-        lognn = Loginn()
-        lognn.close
 
 
 class Kek(QWidget):
@@ -46,11 +29,65 @@ class Kek(QWidget):
         uic.loadUi('designs/vkl.ui', self)
 
 
+class Registr(QWidget):
+    def __init__(self):
+        super().__init__()
+        uic.loadUi('designs/regg.ui', self)
+        self.okk.clicked.connect(self.reg)
+
+    def reg(self):
+        if self.prl.toPlainText() == self.prl_2.toPlainText():
+            self.oss = Osnova()
+            conn = sqlite3.connect('rabochka/persons.db')
+            cur = conn.cursor()
+            result = cur.execute(f'''SELECT idshka FROM users''').fetchall()
+            logins = cur.execute(f'''SELECT login FROM users''').fetchall()
+            log = []
+            for elem in logins:
+                log.append(*elem)
+            if self.log.toPlainText() not in log:
+                cur.execute(f'''INSERT INTO users(login,parol,idshka) 
+                VALUES('{self.log.toPlainText()}','{self.prl.toPlainText()}','{str(int(*result[-1]) + 1)}')''')
+                QMessageBox.critical(self, "Готово!", "Поздравляю с регистрацией!", QMessageBox.Ok)
+                conn.commit()
+                self.oss.mem()
+                self.close()
+            else:
+                QMessageBox.critical(self, "Кудааааа", "Такой пользователь уже есть!", QMessageBox.Ok)
+        else:
+            QMessageBox.critical(self, "Упс!", "Пароли не совпадают", QMessageBox.Ok)
+
+
+class Loginn(QWidget):
+    def __init__(self):
+        super().__init__()
+        uic.loadUi('designs/log.ui', self)
+
+    def proverka(self):
+        conn = sqlite3.connect('rabochka/persons.db')
+        cur = conn.cursor()
+        logins = cur.execute(f'''SELECT login FROM users''').fetchall()
+        prls = cur.execute(f'''SELECT login,parol FROM users''').fetchall()
+        id = cur.execute(f'''SELECT idshka FROM users''').fetchall()
+        log = []
+        for elem in logins:
+            log.append(*elem)
+        if self.loginn.toPlainText() not in log:
+            QMessageBox.critical(self, "Кудааааа", "Такого пользователя нет", QMessageBox.Ok)
+        elif (self.loginn.toPlainText(), self.paroll.toPlainText()) not in prls:
+            QMessageBox.critical(self, "Кудааааа", "Пароль не правильный)))", QMessageBox.Ok)
+        elif (self.loginn.toPlainText(), self.paroll.toPlainText()) in prls:
+            QMessageBox.critical(self, "Ок", "ок", QMessageBox.Ok)
+            self.oss = Osnova()
+            self.oss.id = id[prls.index((self.loginn.toPlainText(), self.paroll.toPlainText()))]
+            self.close()
+            self.oss.show()
+
+
 class Shbln(QWidget):
     def __init__(self):
         super().__init__()
         uic.loadUi('designs/sbl.ui', self)
-
         self.x = Image.open('sbln/3.jpg')
         self.size = 150, 150
         self.x.thumbnail(self.size)
@@ -343,6 +380,10 @@ class Osnova(QMainWindow):
 
     def mem(self):
         self.osn = Loginn()
+        self.regg = Registr()
+        self.osn.regist.clicked.connect(self.regg.show)
+        self.osn.regist.clicked.connect(self.osn.close)
+        self.osn.voity.clicked.connect(self.osn.proverka)
         self.osn.show()
 
 
