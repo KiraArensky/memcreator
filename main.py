@@ -430,7 +430,7 @@ class Osnova(QMainWindow):
             self.sohranit.hide()
             self.flag_deistv = False
             self.flag_2 = False
-            self.img = self.ramka.copy()
+            self.img = self.ramka
             self.a = ImageQt(self.img)
             self.pixmap = QPixmap.fromImage(self.a)
             self.label.setPixmap(self.pixmap)

@@ -162,7 +162,7 @@
      <number>255</number>
     </property>
     <property name="singleStep">
-     <number>1</number>
+     <number>15</number>
     </property>
     <property name="stepType">
      <enum>QAbstractSpinBox::DefaultStepType</enum>
