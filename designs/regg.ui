@@ -120,6 +120,19 @@
     <string>Зарегистрироваться</string>
    </property>
   </widget>
+  <widget class="QPushButton" name="buttonNazad">
+   <property name="geometry">
+    <rect>
+     <x>52</x>
+     <y>140</y>
+     <width>71</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Назад</string>
+   </property>
+  </widget>
  </widget>
  <resources/>
  <connections/>

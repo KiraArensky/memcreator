@@ -34,10 +34,15 @@ class Registr(QWidget):
         super().__init__()
         uic.loadUi('designs/regg.ui', self)
         self.okk.clicked.connect(self.reg)
+        self.buttonNazad.clicked.connect(self.nazad)
+        self.oss = Osnova()
+
+    def nazad(self):
+        self.oss.mem()
+        self.close()
 
     def reg(self):
         if self.prl.toPlainText() == self.prl_2.toPlainText():
-            self.oss = Osnova()
             conn = sqlite3.connect('rabochka/persons.db')
             cur = conn.cursor()
             result = cur.execute(f'''SELECT idshka FROM users''').fetchall()
@@ -87,7 +92,6 @@ class Loginn(QWidget):
         elif (self.loginn.toPlainText(), self.paroll.toPlainText()) not in prls:
             QMessageBox.critical(self, "Кудааааа", "Пароль не правильный)))", QMessageBox.Ok)
         elif (self.loginn.toPlainText(), self.paroll.toPlainText()) in prls:
-            QMessageBox.critical(self, "Ок", "ок", QMessageBox.Ok)
             self.oss = Osnova()
             self.oss.id = id[prls.index((self.loginn.toPlainText(), self.paroll.toPlainText()))][0]
             self.oss.lvl = lvls[prls.index((self.loginn.toPlainText(), self.paroll.toPlainText()))][0]
@@ -99,12 +103,42 @@ class Shbln(QWidget):
     def __init__(self):
         super().__init__()
         uic.loadUi('designs/sbl.ui', self)
-        self.x = Image.open('sbln/3.jpg')
-        self.size = 150, 150
-        self.x.thumbnail(self.size)
-        self.a = ImageQt(self.x)
-        self.pixmap = QPixmap.fromImage(self.a)
-        self.pic_1.setPixmap(self.pixmap)
+        self.osn = Osnova()
+        self.button.clicked.connect(self.vibor)
+        self.flag = False
+
+    def vibor(self):
+        self.f1 = self.radioButton_1.isChecked()
+        self.f2 = self.radioButton_2.isChecked()
+        self.f3 = self.radioButton_3.isChecked()
+        self.f4 = self.radioButton_4.isChecked()
+        self.f5 = self.radioButton_5.isChecked()
+        self.f6 = self.radioButton_6.isChecked()
+        if self.f1:
+            self.osn.shbln_pic = 'sbln/1.jpg'
+            self.flag = True
+        elif self.f2:
+            self.osn.shbln_pic = 'sbln/2.jpg'
+            self.flag = True
+        elif self.f3:
+            self.osn.shbln_pic = 'sbln/3.jpg'
+            self.flag = True
+        elif self.f4:
+            self.osn.shbln_pic = 'sbln/4.jpg'
+            self.flag = True
+        elif self.f5:
+            self.osn.shbln_pic = 'sbln/5.jpg'
+            self.flag = True
+        elif self.f6:
+            self.osn.shbln_pic = 'sbln/6.jpg'
+            self.flag = True
+        else:
+            QMessageBox.critical(self, "Эм", "Вы не выбрали шаблон", QMessageBox.Ok)
+        if self.flag:
+            self.osn.show()
+            self.osn.flag_for_shln = True
+            self.osn.yo()
+            self.close()
 
 
 class Osnova(QMainWindow):
@@ -139,18 +173,24 @@ class Osnova(QMainWindow):
         self.przr = 255
         self.shrift.currentTextChanged.connect(self.srft_changed)
         self.shrft = 'Arial.ttf'
+        self.flag_for_combbox = True
+        self.flag_for_shln = False
 
     def combbox(self):
         spisok = []
         for (dirpath, dirnames, filenames) in walk('shrifts/'):
             spisok.extend(filenames)
             break
-        if self.lvl < 10:
-            self.shrift.addItems(spisok[:3])
-        elif self.lvl >= 10 and self.lvl < 50:
-            self.shrift.addItems(spisok[:6])
-        else:
-            self.shrift.addItems(spisok[:15])
+        if self.flag_for_combbox:
+            if self.lvl < 10:
+                self.shrift.addItems(spisok[:3])
+                self.flag_for_combbox = False
+            elif self.lvl >= 10 and self.lvl < 50:
+                self.shrift.addItems(spisok[:6])
+                self.flag_for_combbox = False
+            else:
+                self.shrift.addItems(spisok[:15])
+                self.flag_for_combbox = False
 
     def flgok(self):
         self.flag = True
@@ -195,9 +235,12 @@ class Osnova(QMainWindow):
                                            font-weight:600;\">Ой, нет мема! Нечего сохранять</span></p></body></html>"))
 
     def yo(self):
-        self.combbox()
         try:
-            self.fname = QFileDialog.getOpenFileName(self, 'Выбрать картинку', '')[0]
+            if self.flag_for_shln:
+                self.fname = self.shbln_pic
+                self.flag_for_shln = False
+            elif self.flag_for_shln is False:
+                self.fname = QFileDialog.getOpenFileName(self, 'Выбрать картинку', '')[0]
             self.img = Image.open(self.fname)
             self.size = 400, 400
             self.img.thumbnail(self.size, Image.Resampling.LANCZOS)
@@ -214,6 +257,7 @@ class Osnova(QMainWindow):
     def spros_text(self):
         if self.flag_deistv:
             self.text_mem, self.ok_pressed = QInputDialog.getText(self, "Текст", "Введите текст")
+            self.combbox()
             self.vstav_text()
         else:
             QMessageBox.critical(self, "Ой, ошибка ", "Ты забыл закончить предыдущее действие, бака", QMessageBox.Ok)
@@ -340,12 +384,6 @@ class Osnova(QMainWindow):
     def mem_zagolovok(self):
         if self.flag_deistv:
             self.zag_ramk, self.oye = QInputDialog.getText(self, "Введите заголовок", "пиши")
-            if len(self.zag_ramk) > 20:
-                n = len(self.zag_ramk) // 20 + 1
-                lst = []
-                for i in range(n):
-                    lst.append(self.zag_ramk[i * 20:(i + 1) * 20])
-                self.zag_ramk = '\n'.join(lst)
             self.mem_text()
         else:
             QMessageBox.critical(self, "Ой, ошибка ", "Ты забыл закончить предыдущее действие, бака", QMessageBox.Ok)
@@ -396,6 +434,7 @@ class Osnova(QMainWindow):
     def show_sbl(self):
         self.k = Shbln()
         self.k.show()
+        self.close()
 
     def show_zst(self):
         self.w = Kek()
