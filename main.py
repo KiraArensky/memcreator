@@ -1,6 +1,6 @@
 import sys
 import os
-from os import system
+from os import system, walk
 import sqlite3
 
 try:
@@ -46,8 +46,17 @@ class Registr(QWidget):
             for elem in logins:
                 log.append(*elem)
             if self.log.toPlainText() not in log:
-                cur.execute(f'''INSERT INTO users(login,parol,idshka) 
-                VALUES('{self.log.toPlainText()}','{self.prl.toPlainText()}','{str(int(*result[-1]) + 1)}')''')
+                try:
+                    cur.execute(f'''INSERT INTO users(login,parol,idshka) 
+                    VALUES('{self.log.toPlainText()}','{self.prl.toPlainText()}','{str(int(*result[-1]) + 1)}')''')
+                    cur.execute(f'''INSERT INTO levels(id,lvl) 
+                                                    VALUES({int(*result[-1]) + 1},1)''')
+                except:
+                    cur.execute(f'''INSERT INTO users(login,parol,idshka) 
+                    VALUES('{self.log.toPlainText()}','{self.prl.toPlainText()}','1')''')
+                    cur.execute(f'''INSERT INTO levels(id,lvl) 
+                                                    VALUES(1,1)''')
+
                 QMessageBox.critical(self, "Готово!", "Поздравляю с регистрацией!", QMessageBox.Ok)
                 conn.commit()
                 self.oss.mem()
@@ -69,6 +78,7 @@ class Loginn(QWidget):
         logins = cur.execute(f'''SELECT login FROM users''').fetchall()
         prls = cur.execute(f'''SELECT login,parol FROM users''').fetchall()
         id = cur.execute(f'''SELECT idshka FROM users''').fetchall()
+        lvls = cur.execute(f'''SELECT lvl FROM levels''').fetchall()
         log = []
         for elem in logins:
             log.append(*elem)
@@ -79,7 +89,8 @@ class Loginn(QWidget):
         elif (self.loginn.toPlainText(), self.paroll.toPlainText()) in prls:
             QMessageBox.critical(self, "Ок", "ок", QMessageBox.Ok)
             self.oss = Osnova()
-            self.oss.id = id[prls.index((self.loginn.toPlainText(), self.paroll.toPlainText()))]
+            self.oss.id = id[prls.index((self.loginn.toPlainText(), self.paroll.toPlainText()))][0]
+            self.oss.lvl = lvls[prls.index((self.loginn.toPlainText(), self.paroll.toPlainText()))][0]
             self.close()
             self.oss.show()
 
@@ -100,6 +111,8 @@ class Osnova(QMainWindow):
     def __init__(self):
         super().__init__()
         uic.loadUi('designs/osn.ui', self)  # Загружаем дизайн
+        self.conn = sqlite3.connect('rabochka/persons.db')
+        self.cur = self.conn.cursor()
         self.kartinka.clicked.connect(self.yo)
         self.bibl.clicked.connect(self.show_sbl)
         self.vst_text.clicked.connect(self.spros_text)
@@ -124,12 +137,20 @@ class Osnova(QMainWindow):
         self.grds_txt = 0
         self.prozrach.valueChanged.connect(self.prozr)
         self.przr = 255
-        self.combbox()
         self.shrift.currentTextChanged.connect(self.srft_changed)
-        self.shrft = 'Arial'
+        self.shrft = 'Arial.ttf'
 
     def combbox(self):
-        self.shrift.addItems(['Arial', 'Astakhov_First_Simple', 'Impact'])
+        spisok = []
+        for (dirpath, dirnames, filenames) in walk('shrifts/'):
+            spisok.extend(filenames)
+            break
+        if self.lvl < 10:
+            self.shrift.addItems(spisok[:3])
+        elif self.lvl >= 10 and self.lvl < 50:
+            self.shrift.addItems(spisok[:6])
+        else:
+            self.shrift.addItems(spisok[:15])
 
     def flgok(self):
         self.flag = True
@@ -163,6 +184,9 @@ class Osnova(QMainWindow):
                 self.img.save(f'mem/{nazv}.png')
             else:
                 self.img.save('Вы_не_ввели_название.png')
+            self.lvl += 1
+            self.cur.execute(f'''UPDATE levels SET lvl = {self.lvl} WHERE id = {self.id}''')
+            self.conn.commit()
             self.img.thumbnail(self.size)
         except:
             _translate = QtCore.QCoreApplication.translate
@@ -171,6 +195,7 @@ class Osnova(QMainWindow):
                                            font-weight:600;\">Ой, нет мема! Нечего сохранять</span></p></body></html>"))
 
     def yo(self):
+        self.combbox()
         try:
             self.fname = QFileDialog.getOpenFileName(self, 'Выбрать картинку', '')[0]
             self.img = Image.open(self.fname)
@@ -205,7 +230,7 @@ class Osnova(QMainWindow):
 
     def srft_changed(self, ):
         if self.flag is False:
-            self.shrft = self.shrift.currentText()
+            self.shrft = str(self.shrift.currentText())
             self.vstav_text()
 
     def vstav_text(self):
@@ -213,7 +238,7 @@ class Osnova(QMainWindow):
             try:
                 self.nazd = self.img.copy()
                 name = self.text_mem
-                self.font = ImageFont.truetype(f'shrifts/{self.shrft}.ttf', size=self.size_text)
+                self.font = ImageFont.truetype(font=f'shrifts/{self.shrft}', size=self.size_text)
                 line_height = sum(self.font.getmetrics())
                 fontimage = Image.new('L', (self.font.getsize(name)[0], line_height))
                 x, y = fontimage.size
