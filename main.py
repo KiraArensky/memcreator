@@ -22,6 +22,8 @@ from PyQt5.QtGui import QPixmap
 from PyQt5 import QtCore
 from PyQt5.QtWidgets import QInputDialog
 
+id = 0
+lvl = 0
 
 class Kek(QWidget):
     def __init__(self):
@@ -50,7 +52,9 @@ class Registr(QWidget):
             log = []
             for elem in logins:
                 log.append(*elem)
-            if self.log.toPlainText() not in log:
+            if self.log.toPlainText() == '' or self.prl.toPlainText() == '':
+                QMessageBox.critical(self, "А ты шутник", "Вы ничего не ввели в поле", QMessageBox.Ok)
+            elif self.log.toPlainText() not in log:
                 try:
                     cur.execute(f'''INSERT INTO users(login,parol,idshka) 
                     VALUES('{self.log.toPlainText()}','{self.prl.toPlainText()}','{str(int(*result[-1]) + 1)}')''')
@@ -78,6 +82,7 @@ class Loginn(QWidget):
         uic.loadUi('designs/log.ui', self)
 
     def proverka(self):
+        global id, lvl
         conn = sqlite3.connect('rabochka/persons.db')
         cur = conn.cursor()
         logins = cur.execute(f'''SELECT login FROM users''').fetchall()
@@ -93,8 +98,8 @@ class Loginn(QWidget):
             QMessageBox.critical(self, "Кудааааа", "Пароль не правильный)))", QMessageBox.Ok)
         elif (self.loginn.toPlainText(), self.paroll.toPlainText()) in prls:
             self.oss = Osnova()
-            self.oss.id = id[prls.index((self.loginn.toPlainText(), self.paroll.toPlainText()))][0]
-            self.oss.lvl = lvls[prls.index((self.loginn.toPlainText(), self.paroll.toPlainText()))][0]
+            id = id[prls.index((self.loginn.toPlainText(), self.paroll.toPlainText()))][0]
+            lvl = lvls[prls.index((self.loginn.toPlainText(), self.paroll.toPlainText()))][0]
             self.close()
             self.oss.show()
 
@@ -177,15 +182,16 @@ class Osnova(QMainWindow):
         self.flag_for_shln = False
 
     def combbox(self):
+        global lvl
         spisok = []
         for (dirpath, dirnames, filenames) in walk('shrifts/'):
             spisok.extend(filenames)
             break
         if self.flag_for_combbox:
-            if self.lvl < 10:
+            if lvl < 10:
                 self.shrift.addItems(spisok[:3])
                 self.flag_for_combbox = False
-            elif self.lvl >= 10 and self.lvl < 50:
+            elif lvl >= 10 and lvl < 50:
                 self.shrift.addItems(spisok[:6])
                 self.flag_for_combbox = False
             else:
@@ -215,6 +221,7 @@ class Osnova(QMainWindow):
             self.vstav_pic()
 
     def sohr(self):
+        global id, lvl
         nazv, ok = QInputDialog.getText(self, "Имя файла",
                                         "Как назвать файл?")
         try:
@@ -224,8 +231,8 @@ class Osnova(QMainWindow):
                 self.img.save(f'mem/{nazv}.png')
             else:
                 self.img.save('Вы_не_ввели_название.png')
-            self.lvl += 1
-            self.cur.execute(f'''UPDATE levels SET lvl = {self.lvl} WHERE id = {self.id}''')
+            lvl += 1
+            self.cur.execute(f'''UPDATE levels SET lvl = {lvl} WHERE id = {id}''')
             self.conn.commit()
             self.img.thumbnail(self.size)
         except:
@@ -235,6 +242,8 @@ class Osnova(QMainWindow):
                                            font-weight:600;\">Ой, нет мема! Нечего сохранять</span></p></body></html>"))
 
     def yo(self):
+        global lvl, id
+        print(lvl)
         try:
             if self.flag_for_shln:
                 self.fname = self.shbln_pic
@@ -397,12 +406,12 @@ class Osnova(QMainWindow):
 
     def mem_ramka(self):
         try:
-            font = ImageFont.truetype(f'shrifts/Times_new_roman.ttf', size=50)
+            font = ImageFont.truetype(f'shrifts/Times_new_roman.ttf', size=30)
             line_height1 = sum(font.getmetrics())
             fontimage1 = Image.new('L', (font.getsize(self.zag_ramk)[0], line_height1))
             x, y = fontimage1.size
             ImageDraw.Draw(fontimage1).text((0, 0), self.zag_ramk, fill=255, font=font)
-            font1 = ImageFont.truetype(f'shrifts/Arial.ttf', size=20)
+            font1 = ImageFont.truetype(f'shrifts/Arial.ttf', size=15)
             line_height = sum(font1.getmetrics())
             fontimage = Image.new('L', (font1.getsize(self.text_ramk)[0], line_height))
             x1, y1 = fontimage.size
