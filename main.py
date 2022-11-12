@@ -44,7 +44,7 @@ class Menu(QWidget):
         self.avatarka.clicked.connect(self.smen_ava)
         self.conn = sqlite3.connect('rabochka/persons.db')
         self.cur = self.conn.cursor()
-        self.avatr = self.cur.execute(f'''SELECT avatarka FROM users WHERE idshka = {id}''').fetchall()
+        self.avatr = self.cur.execute(f'''SELECT avatarka FROM menu WHERE idshka = {id}''').fetchall()
         if self.avatr[0][0] != None and self.avatr[0][0] != '1':
             self.img = Image.open(self.avatr[0][0])
             self.a = ImageQt(self.img)
@@ -65,7 +65,7 @@ class Menu(QWidget):
             self.size = 250, 250
             self.img.thumbnail(self.size, Image.Resampling.LANCZOS)
             self.img.save(f'rabochka/avatars/{id}.png')
-            self.cur.execute(f'''UPDATE users SET avatarka = 'rabochka/avatars/{id}.png' WHERE idshka = {id}''')
+            self.cur.execute(f'''UPDATE menu SET avatarka = 'rabochka/avatars/{id}.png' WHERE idshka = {id}''')
             self.conn.commit()
             self.a = ImageQt(self.img)
             self.pixmap = QPixmap.fromImage(self.a)
@@ -157,14 +157,14 @@ class Registr(QWidget):
                     cur.execute(f'''INSERT INTO users(login,parol,idshka,name) 
                     VALUES('{self.log.toPlainText()}','{self.prl.toPlainText()}',{int(*result[-1]) + 1},
                      '{self.name.toPlainText()}')''')
-                    cur.execute(f'''INSERT INTO levels(id,lvl) 
-                                                    VALUES({int(*result[-1]) + 1},1)''')
+                    cur.execute(f'''INSERT INTO levels(id,lvl) VALUES({int(*result[-1]) + 1},1)''')
+                    cur.execute(f'''INSERT INTO menu(idshka,avatarka) VALUES({int(*result[-1]) + 1},'1')''')
                 except:
                     cur.execute(f'''INSERT INTO users(login,parol,idshka,name) 
                     VALUES('{self.log.toPlainText()}','{self.prl.toPlainText()}',1,'{self.name.toPlainText()}')''')
                     cur.execute(f'''INSERT INTO levels(id,lvl) 
                                                     VALUES(1,1)''')
-
+                    cur.execute(f'''INSERT INTO menu(idshka,avatarka) VALUES(1,'1')''')
                 QMessageBox.critical(self, "Готово!", "Поздравляю с регистрацией!", QMessageBox.Ok)
                 conn.commit()
                 self.oss.mem()
@@ -333,16 +333,18 @@ class Osnova(QMainWindow):
         nazv, ok = QInputDialog.getText(self, "Имя файла",
                                         "Как назвать файл?")
         try:
-            sizezz = 1000, 1000
-            self.img.resize(sizezz, Image.Resampling.LANCZOS)
             if nazv:
                 self.img.save(f'mem/{nazv}.png')
+                QMessageBox.critical(self, "Ура", f'Мем сохранен в папке .../memcreator/mem/{nazv}.png',
+                                     QMessageBox.Ok)
             else:
-                self.img.save('Вы_не_ввели_название.png')
+                self.img.save('mem/Вы_не_ввели_название.png')
+                QMessageBox.critical(self, "Ура", 'Мем сохранен в папке .../memcreator/mem/Вы_не_ввели_название.png',
+                                     QMessageBox.Ok)
             lvl += 1
             self.cur.execute(f'''UPDATE levels SET lvl = {lvl} WHERE id = {id}''')
             self.conn.commit()
-            self.img.thumbnail(self.size)
+            _translate = QtCore.QCoreApplication.translate
         except:
             _translate = QtCore.QCoreApplication.translate
             self.label.setText(_translate("MainWindow",
@@ -409,21 +411,13 @@ class Osnova(QMainWindow):
                 self.flag_ok.show()
                 self.sohranit.hide()
                 for i in range(3):
-                    # move right
                     self.nazd.paste((0, 0, 0), (x - i, y), mask=fontimage)
-                    # move left
                     self.nazd.paste((0, 0, 0), (x + i, y), mask=fontimage)
-                    # move up
                     self.nazd.paste((0, 0, 0), (x, y + i), mask=fontimage)
-                    # move down
                     self.nazd.paste((0, 0, 0), (x, y - i), mask=fontimage)
-                    # diagnal left up
                     self.nazd.paste((0, 0, 0), (x - i, y + i), mask=fontimage)
-                    # diagnal right up
                     self.nazd.paste((0, 0, 0), (x + i, y + i), mask=fontimage)
-                    # diagnal left down
                     self.nazd.paste((0, 0, 0), (x - i, y - i), mask=fontimage)
-                    # diagnal right down
                     self.nazd.paste((0, 0, 0), (x + i, y - i), mask=fontimage)
                 self.nazd.paste((255, 255, 255), (x, y), mask=fontimage)
                 self.a = ImageQt(self.nazd)
