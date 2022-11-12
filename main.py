@@ -406,6 +406,7 @@ class Osnova(QMainWindow):
 
     def mem_ramka(self):
         try:
+            width, height = self.img.size
             font = ImageFont.truetype(f'shrifts/Times_new_roman.ttf', size=30)
             line_height1 = sum(font.getmetrics())
             fontimage1 = Image.new('L', (font.getsize(self.zag_ramk)[0], line_height1))
@@ -416,13 +417,13 @@ class Osnova(QMainWindow):
             fontimage = Image.new('L', (font1.getsize(self.text_ramk)[0], line_height))
             x1, y1 = fontimage.size
             ImageDraw.Draw(fontimage).text((0, 0), self.text_ramk, fill=255, font=font1)
-            self.ramka = Image.new('RGBA', (self.width + 50, self.height + 10 + y + 15 + y1 + 40), 'black')
+            self.ramka = Image.new('RGBA', (width + 50, height + 10 + y + 15 + y1 + 40), 'black')
             idraw = ImageDraw.Draw(self.ramka)
-            idraw.rectangle((20, 20, self.width + 30, self.height + 30), fill='white')
-            idraw.rectangle((23, 23, self.width + 27, self.height + 27), fill='black')
-            self.ramka.paste((255, 255, 255), ((self.width + 50 - x) // 2, (self.height + 40)),
+            idraw.rectangle((20, 20, width + 30, height + 30), fill='white')
+            idraw.rectangle((23, 23, width + 27, height + 27), fill='black')
+            self.ramka.paste((255, 255, 255), ((width + 50 - x) // 2, (height + 40)),
                              mask=fontimage1)
-            self.ramka.paste((255, 255, 255), ((self.width + 50 - x1) // 2, (self.height + 40 + y + 10)),
+            self.ramka.paste((255, 255, 255), ((width + 50 - x1) // 2, (height + 40 + y + 10)),
                              mask=fontimage)
             self.ramka.paste(self.img, (25, 25))
             self.ramka.thumbnail(self.size, Image.Resampling.LANCZOS)
@@ -430,8 +431,8 @@ class Osnova(QMainWindow):
             self.sohranit.hide()
             self.flag_deistv = False
             self.flag_2 = False
-            self.img = self.ramka
-            self.a = ImageQt(self.img)
+            self.nazd = self.ramka.copy()
+            self.a = ImageQt(self.nazd)
             self.pixmap = QPixmap.fromImage(self.a)
             self.label.setPixmap(self.pixmap)
         except:
