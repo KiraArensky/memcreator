@@ -24,11 +24,109 @@ from PyQt5.QtWidgets import QInputDialog
 
 id = 0
 lvl = 0
+logiin = 0
+password = 0
+namee = 0
+
 
 class Kek(QWidget):
     def __init__(self):
         super().__init__()
         uic.loadUi('designs/vkl.ui', self)
+
+
+class Menu(QWidget):
+    def __init__(self):
+        global id
+        super().__init__()
+        uic.loadUi('designs/menu.ui', self)
+        self.smen_prl.clicked.connect(self.chngd)
+        self.avatarka.clicked.connect(self.smen_ava)
+        self.conn = sqlite3.connect('rabochka/persons.db')
+        self.cur = self.conn.cursor()
+        self.avatr = self.cur.execute(f'''SELECT avatarka FROM users WHERE idshka = {id}''').fetchall()
+        if self.avatr[0][0] != None and self.avatr[0][0] != '1':
+            self.img = Image.open(self.avatr[0][0])
+            self.a = ImageQt(self.img)
+            self.pixmap = QPixmap.fromImage(self.a)
+            self.label.setPixmap(self.pixmap)
+        else:
+            self.img = Image.open('rabochka/kot_spit.jpg')
+            self.a = ImageQt(self.img)
+            self.pixmap = QPixmap.fromImage(self.a)
+            self.label.setPixmap(self.pixmap)
+        self.texxt()
+
+    def smen_ava(self):
+        global id
+        try:
+            self.fname = QFileDialog.getOpenFileName(self, 'Выбрать картинку', '')[0]
+            self.img = Image.open(self.fname)
+            self.size = 250, 250
+            self.img.thumbnail(self.size, Image.Resampling.LANCZOS)
+            self.img.save(f'rabochka/avatars/{id}.png')
+            self.cur.execute(f'''UPDATE users SET avatarka = 'rabochka/avatars/{id}.png' WHERE idshka = {id}''')
+            self.conn.commit()
+            self.a = ImageQt(self.img)
+            self.pixmap = QPixmap.fromImage(self.a)
+            self.label.setPixmap(self.pixmap)
+        except:
+            self.img = Image.open('rabochka/kot_spit.jpg')
+            self.a = ImageQt(self.img)
+            self.pixmap = QPixmap.fromImage(self.a)
+            self.label.setPixmap(self.pixmap)
+
+
+    def texxt(self):
+        global id, lvl, logiin, password, namee
+        _translate = QtCore.QCoreApplication.translate
+        self.privet.setText(_translate('MainWindow',
+                                       f'<html><head/><body><p align="center"><span style=" font-size:24pt; '
+                                       f'font-weight:600;">Привет, {namee}!</span></p></body></html>'))
+        self.lvl.setText(_translate('MainWindow',
+                                    f'<html><head/><body><p><span style=" font-size:9pt; font-weight:600;'
+                                    f'">Твой уровень: {lvl}</span></p></body></html>'))
+        self.login.setText(_translate('MainWindow',
+                                      f'<html><head/><body><p><span style=" font-size:9pt; font-weight:600;'
+                                      f'">Твой логин: {logiin}</span></p></body></html>'))
+        if lvl < 10:
+            s = open('text/lvl1.txt', mode='r', encoding="utf-8")
+        elif lvl >= 10 and lvl < 50:
+            s = open('text/lvl2.txt', mode='r', encoding="utf-8")
+        elif lvl >= 50:
+            s = open('text/lvl3.txt', mode='r', encoding="utf-8")
+        sa = s.read()
+        self.pohvala.setText(_translate('MainWindow',
+                                        f'<html><head/><body><p><span style=" font-size:9pt; font-weight:600;'
+                                        f'">{sa}</span></p></body></html>'))
+
+    def chngd(self):
+        self.smn = Smenprl()
+        self.smn.show()
+        self.close()
+
+
+class Smenprl(QWidget):
+    def __init__(self):
+        super().__init__()
+        uic.loadUi('designs/chng.ui', self)
+        self.sohr.clicked.connect(self.prlsmn)
+
+    def prlsmn(self):
+        if self.prl1.toPlainText() == self.prl2.toPlainText():
+            conn = sqlite3.connect('rabochka/persons.db')
+            cur = conn.cursor()
+            if self.prl1.toPlainText() == '' or self.prl2.toPlainText() == '':
+                QMessageBox.critical(self, "А ты шутник", "Вы ничего не ввели в поле", QMessageBox.Ok)
+            else:
+                cur.execute(f'''UPDATE users SET parol = {self.prl2.toPlainText()} WHERE idshka = {id}''')
+                QMessageBox.critical(self, "Готово!", "Пароль был изменен", QMessageBox.Ok)
+                conn.commit()
+                self.mnu = Menu()
+                self.mnu.show()
+                self.close()
+        else:
+            QMessageBox.critical(self, "Упс!", "Пароли не совпадают", QMessageBox.Ok)
 
 
 class Registr(QWidget):
@@ -52,17 +150,18 @@ class Registr(QWidget):
             log = []
             for elem in logins:
                 log.append(*elem)
-            if self.log.toPlainText() == '' or self.prl.toPlainText() == '':
+            if self.log.toPlainText() == '' or self.prl.toPlainText() == '' or self.name.toPlainText() == '':
                 QMessageBox.critical(self, "А ты шутник", "Вы ничего не ввели в поле", QMessageBox.Ok)
             elif self.log.toPlainText() not in log:
                 try:
-                    cur.execute(f'''INSERT INTO users(login,parol,idshka) 
-                    VALUES('{self.log.toPlainText()}','{self.prl.toPlainText()}','{str(int(*result[-1]) + 1)}')''')
+                    cur.execute(f'''INSERT INTO users(login,parol,idshka,name) 
+                    VALUES('{self.log.toPlainText()}','{self.prl.toPlainText()}',{int(*result[-1]) + 1},
+                     '{self.name.toPlainText()}')''')
                     cur.execute(f'''INSERT INTO levels(id,lvl) 
                                                     VALUES({int(*result[-1]) + 1},1)''')
                 except:
-                    cur.execute(f'''INSERT INTO users(login,parol,idshka) 
-                    VALUES('{self.log.toPlainText()}','{self.prl.toPlainText()}','1')''')
+                    cur.execute(f'''INSERT INTO users(login,parol,idshka,name) 
+                    VALUES('{self.log.toPlainText()}','{self.prl.toPlainText()}',1,'{self.name.toPlainText()}')''')
                     cur.execute(f'''INSERT INTO levels(id,lvl) 
                                                     VALUES(1,1)''')
 
@@ -82,12 +181,13 @@ class Loginn(QWidget):
         uic.loadUi('designs/log.ui', self)
 
     def proverka(self):
-        global id, lvl
+        global id, lvl, logiin, password, namee
         conn = sqlite3.connect('rabochka/persons.db')
         cur = conn.cursor()
         logins = cur.execute(f'''SELECT login FROM users''').fetchall()
         prls = cur.execute(f'''SELECT login,parol FROM users''').fetchall()
-        id = cur.execute(f'''SELECT idshka FROM users''').fetchall()
+        idd = cur.execute(f'''SELECT idshka FROM users''').fetchall()
+        names = cur.execute(f'''SELECT name FROM users''').fetchall()
         lvls = cur.execute(f'''SELECT lvl FROM levels''').fetchall()
         log = []
         for elem in logins:
@@ -98,8 +198,11 @@ class Loginn(QWidget):
             QMessageBox.critical(self, "Кудааааа", "Пароль не правильный)))", QMessageBox.Ok)
         elif (self.loginn.toPlainText(), self.paroll.toPlainText()) in prls:
             self.oss = Osnova()
-            id = id[prls.index((self.loginn.toPlainText(), self.paroll.toPlainText()))][0]
+            id = idd[prls.index((self.loginn.toPlainText(), self.paroll.toPlainText()))][0]
             lvl = lvls[prls.index((self.loginn.toPlainText(), self.paroll.toPlainText()))][0]
+            logiin = self.loginn.toPlainText()
+            password = self.paroll.toPlainText()
+            namee = names[prls.index((self.loginn.toPlainText(), self.paroll.toPlainText()))][0]
             self.close()
             self.oss.show()
 
@@ -159,6 +262,7 @@ class Osnova(QMainWindow):
         self.ramka.clicked.connect(self.mem_zagolovok)
         self.sohranit.clicked.connect(self.sohr)
         self.flag_ok.clicked.connect(self.flgok)
+        self.menu.clicked.connect(self.mennu)
         self.flag_ok.hide()
         self.x1 = 30
         self.y1 = 30
@@ -180,6 +284,10 @@ class Osnova(QMainWindow):
         self.shrft = 'Arial.ttf'
         self.flag_for_combbox = True
         self.flag_for_shln = False
+
+    def mennu(self):
+        self.menu = Menu()
+        self.menu.show()
 
     def combbox(self):
         global lvl
@@ -243,7 +351,6 @@ class Osnova(QMainWindow):
 
     def yo(self):
         global lvl, id
-        print(lvl)
         try:
             if self.flag_for_shln:
                 self.fname = self.shbln_pic
