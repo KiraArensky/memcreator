@@ -1,12 +1,20 @@
 import sys
 import os
 import sqlite3
-from os import walk
-from PyQt5 import uic, QtCore
-from PIL.ImageQt import ImageQt
-from PIL import Image, ImageDraw, ImageFont
-from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QFileDialog, QMessageBox, QInputDialog
-from PyQt5.QtGui import QPixmap
+from os import walk, system
+try:
+    from PyQt5 import uic, QtCore
+    from PIL.ImageQt import ImageQt
+    from PIL import Image, ImageDraw, ImageFont
+    from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QFileDialog, QMessageBox, QInputDialog
+    from PyQt5.QtGui import QPixmap
+except:
+    system("pip install -r requirements.txt")
+    from PyQt5 import uic, QtCore
+    from PIL.ImageQt import ImageQt
+    from PIL import Image, ImageDraw, ImageFont
+    from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QFileDialog, QMessageBox, QInputDialog
+    from PyQt5.QtGui import QPixmap
 
 id = 0
 lvl = 0
