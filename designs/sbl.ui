@@ -179,7 +179,7 @@
     <pixmap>../sbln/6_1.png</pixmap>
    </property>
   </widget>
-  <widget class="QPushButton" name="button">
+  <widget class="QPushButton" name="choose">
    <property name="geometry">
     <rect>
      <x>130</x>
@@ -192,7 +192,7 @@
     <string>Использовать</string>
    </property>
   </widget>
-  <widget class="QRadioButton" name="radioButton_1">
+  <widget class="QRadioButton" name="pic1">
    <property name="geometry">
     <rect>
      <x>40</x>
@@ -205,7 +205,7 @@
     <string>Эта?</string>
    </property>
   </widget>
-  <widget class="QRadioButton" name="radioButton_2">
+  <widget class="QRadioButton" name="pic2">
    <property name="geometry">
     <rect>
      <x>180</x>
@@ -218,7 +218,7 @@
     <string>Эта?</string>
    </property>
   </widget>
-  <widget class="QRadioButton" name="radioButton_3">
+  <widget class="QRadioButton" name="pic3">
    <property name="geometry">
     <rect>
      <x>40</x>
@@ -231,7 +231,7 @@
     <string>Эта?</string>
    </property>
   </widget>
-  <widget class="QRadioButton" name="radioButton_4">
+  <widget class="QRadioButton" name="pic4">
    <property name="geometry">
     <rect>
      <x>180</x>
@@ -244,7 +244,7 @@
     <string>Эта?</string>
    </property>
   </widget>
-  <widget class="QRadioButton" name="radioButton_5">
+  <widget class="QRadioButton" name="pic5">
    <property name="geometry">
     <rect>
      <x>30</x>
@@ -257,7 +257,7 @@
     <string>Эта?</string>
    </property>
   </widget>
-  <widget class="QRadioButton" name="radioButton_6">
+  <widget class="QRadioButton" name="pic6">
    <property name="geometry">
     <rect>
      <x>230</x>

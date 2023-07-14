@@ -26,7 +26,7 @@
    <string>memcreator</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QPushButton" name="kartinka">
+   <widget class="QPushButton" name="pic">
     <property name="geometry">
      <rect>
       <x>30</x>
@@ -39,7 +39,7 @@
      <string>Выбрать картинку</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label">
+   <widget class="QLabel" name="meme">
     <property name="geometry">
      <rect>
       <x>30</x>
@@ -52,7 +52,7 @@
      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;Тут должна быть ваша картинка&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="bibl">
+   <widget class="QPushButton" name="library">
     <property name="geometry">
      <rect>
       <x>330</x>
@@ -91,7 +91,7 @@
      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:18pt; font-weight:600;&quot;&gt;функционал&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="sohranit">
+   <widget class="QPushButton" name="save">
     <property name="geometry">
      <rect>
       <x>670</x>
@@ -104,7 +104,7 @@
      <string>Сохранить мем</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="flag_ok">
+   <widget class="QPushButton" name="save_action">
     <property name="geometry">
      <rect>
       <x>720</x>
@@ -117,7 +117,7 @@
      <string>Закончить</string>
     </property>
    </widget>
-   <widget class="QSlider" name="razmer_2">
+   <widget class="QSlider" name="size_pic">
     <property name="geometry">
      <rect>
       <x>640</x>
@@ -130,7 +130,7 @@
      <enum>Qt::Horizontal</enum>
     </property>
    </widget>
-   <widget class="QSlider" name="razmer">
+   <widget class="QSlider" name="size_text">
     <property name="geometry">
      <rect>
       <x>640</x>
@@ -143,7 +143,7 @@
      <enum>Qt::Horizontal</enum>
     </property>
    </widget>
-   <widget class="QSpinBox" name="prozrach">
+   <widget class="QSpinBox" name="visibility">
     <property name="geometry">
      <rect>
       <x>540</x>
@@ -164,9 +164,6 @@
     <property name="singleStep">
      <number>15</number>
     </property>
-    <property name="stepType">
-     <enum>QAbstractSpinBox::DefaultStepType</enum>
-    </property>
     <property name="value">
      <number>255</number>
     </property>
@@ -184,7 +181,7 @@
      <string>Меню</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="vst_pic">
+   <widget class="QPushButton" name="paste_pic">
     <property name="geometry">
      <rect>
       <x>540</x>
@@ -197,7 +194,7 @@
      <string>Вставить картинку</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="ramka">
+   <widget class="QPushButton" name="demotivator">
     <property name="geometry">
      <rect>
       <x>540</x>
@@ -210,7 +207,7 @@
      <string>Сделать рамку с текстом</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="vst_text">
+   <widget class="QPushButton" name="paste_text">
     <property name="geometry">
      <rect>
       <x>540</x>
@@ -223,7 +220,7 @@
      <string>Вставить текст</string>
     </property>
    </widget>
-   <widget class="QComboBox" name="shrift">
+   <widget class="QComboBox" name="font">
     <property name="geometry">
      <rect>
       <x>540</x>
@@ -233,7 +230,7 @@
      </rect>
     </property>
    </widget>
-   <widget class="QDial" name="gradus">
+   <widget class="QDial" name="degree_pic">
     <property name="geometry">
      <rect>
       <x>820</x>
@@ -255,7 +252,7 @@
      <enum>Qt::Horizontal</enum>
     </property>
    </widget>
-   <widget class="QDial" name="gradus_2">
+   <widget class="QDial" name="degree_text">
     <property name="geometry">
      <rect>
       <x>820</x>

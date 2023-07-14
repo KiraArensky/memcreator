@@ -61,7 +61,7 @@
     </rect>
    </property>
   </widget>
-  <widget class="QTextEdit" name="paroll">
+  <widget class="QTextEdit" name="passwordd">
    <property name="geometry">
     <rect>
      <x>160</x>
@@ -84,7 +84,7 @@
     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:18pt; font-weight:600;&quot;&gt;Авторизация&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="voity">
+  <widget class="QPushButton" name="login">
    <property name="geometry">
     <rect>
      <x>300</x>

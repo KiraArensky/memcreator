@@ -25,7 +25,7 @@
   <property name="windowTitle">
    <string>menu</string>
   </property>
-  <widget class="QLabel" name="label">
+  <widget class="QLabel" name="pic">
    <property name="geometry">
     <rect>
      <x>50</x>
@@ -41,7 +41,7 @@
     <pixmap>../rabochka/kot_spit.jpg</pixmap>
    </property>
   </widget>
-  <widget class="QLabel" name="privet">
+  <widget class="QLabel" name="hi">
    <property name="geometry">
     <rect>
      <x>85</x>
@@ -54,7 +54,7 @@
     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:24pt; font-weight:600;&quot;&gt;Привет, Кира!&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
   </widget>
-  <widget class="QLabel" name="lvl">
+  <widget class="QLabel" name="lvvl">
    <property name="geometry">
     <rect>
      <x>340</x>
@@ -67,7 +67,7 @@
     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:9pt; font-weight:600;&quot;&gt;Твой уровень:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
   </widget>
-  <widget class="QLabel" name="login">
+  <widget class="QLabel" name="logiin">
    <property name="geometry">
     <rect>
      <x>340</x>
@@ -80,7 +80,7 @@
     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:9pt; font-weight:600;&quot;&gt;Твой логин:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
   </widget>
-  <widget class="QLabel" name="pohvala">
+  <widget class="QLabel" name="praise">
    <property name="geometry">
     <rect>
      <x>340</x>
@@ -93,7 +93,7 @@
     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:9pt; font-weight:600;&quot;&gt;Твой уровень:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="smen_prl">
+  <widget class="QPushButton" name="change">
    <property name="geometry">
     <rect>
      <x>750</x>
@@ -106,7 +106,7 @@
     <string>Сменить пароль</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="avatarka">
+  <widget class="QPushButton" name="userpic">
    <property name="geometry">
     <rect>
      <x>50</x>

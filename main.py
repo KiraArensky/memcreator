@@ -2,13 +2,14 @@ import sys
 import os
 import sqlite3
 from os import walk, system
+
 try:
     from PyQt5 import uic, QtCore
     from PIL.ImageQt import ImageQt
     from PIL import Image, ImageDraw, ImageFont
     from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QFileDialog, QMessageBox, QInputDialog
     from PyQt5.QtGui import QPixmap
-except:
+except ModuleNotFoundError:
     system("pip install -r requirements.txt")
     from PyQt5 import uic, QtCore
     from PIL.ImageQt import ImageQt
@@ -16,126 +17,135 @@ except:
     from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QFileDialog, QMessageBox, QInputDialog
     from PyQt5.QtGui import QPixmap
 
-id = 0
-lvl = 0
-logiin = 0
-password = 0
-namee = 0
+id_null = 0
+lvl_null = 0
+login_null = 0
+password_null = 0
+name_null = 0
 
 
-class Zastavka(QWidget):
+class Intro(QWidget):
     def __init__(self):
         super().__init__()
-        uic.loadUi('designs/vkl.ui', self)
+        uic.loadUi('designs/intro.ui', self)
 
 
 class Menu(QWidget):
     def __init__(self):
-        global id
+        global id_null
+
+        self.praise = None
+        self.logiin = None
+        self.lvvl = None
+        self.hi = None
+        self.pic = None
+        self.userpic = None
+        self.change = None
 
         super().__init__()
         uic.loadUi('designs/menu.ui', self)
 
-        self.smen_prl.clicked.connect(self.smena_password)
-        self.avatarka.clicked.connect(self.smen_avatar)
+        self.change.clicked.connect(self.change_password)
+        self.userpic.clicked.connect(self.change_userpic)
         self.conn = sqlite3.connect('rabochka/persons.db')
 
         self.cur = self.conn.cursor()
-        self.avatr = self.cur.execute(f'''SELECT avatarka FROM menu WHERE idshka = {id}''').fetchall()
+        self.picture = self.cur.execute(f'''SELECT avatarka FROM menu WHERE idshka = {id_null}''').fetchall()
 
-        if self.avatr[0][0] != None and self.avatr[0][0] != '1':
-            self.img = Image.open(self.avatr[0][0])
-            self.a = ImageQt(self.img)
-            self.pixmap = QPixmap.fromImage(self.a)
-            self.label.setPixmap(self.pixmap)
+        if self.picture[0][0] is not None and self.picture[0][0] != '1':
+            img = Image.open(self.picture[0][0])
+            img_clone = ImageQt(img)
+            pixmap = QPixmap.fromImage(img_clone)
+            self.pic.setPixmap(pixmap)
         else:
-            self.img = Image.open('rabochka/kot_spit.jpg')
-            self.a = ImageQt(self.img)
-            self.pixmap = QPixmap.fromImage(self.a)
-            self.label.setPixmap(self.pixmap)
+            img = Image.open('rabochka/kot_spit.jpg')
+            img_clone = ImageQt(img)
+            pixmap = QPixmap.fromImage(img_clone)
+            self.pic.setPixmap(pixmap)
 
-        self.text_v_menu()
+        self.text_in_menu()
 
-    def smen_avatar(self):
-        global id
+    def change_userpic(self):
+        global id_null
 
         try:
-            self.fname = QFileDialog.getOpenFileName(self, 'Выбрать картинку', '')[0]
-            self.img = Image.open(self.fname)
+            fname = QFileDialog.getOpenFileName(self, 'Выбрать картинку', '')[0]
+            img = Image.open(fname)
 
-            self.size = 250, 250
-            self.img.thumbnail(self.size, Image.Resampling.LANCZOS)
+            size = 250, 250
+            img.thumbnail(size, Image.Resampling.LANCZOS)
 
-            self.img.save(f'rabochka/avatars/{id}.png')
+            img.save(f'rabochka/avatars/{id_null}.png')
 
-            self.cur.execute(f'''UPDATE menu SET avatarka = 'rabochka/avatars/{id}.png' WHERE idshka = {id}''')
+            self.cur.execute(f'''UPDATE menu SET avatarka = 
+            'rabochka/avatars/{id_null}.png' WHERE idshka = {id_null}''')
             self.conn.commit()
 
-            self.a = ImageQt(self.img)
-            self.pixmap = QPixmap.fromImage(self.a)
-            self.label.setPixmap(self.pixmap)
+            img_clone = ImageQt(img)
+            pixmap = QPixmap.fromImage(img_clone)
+            self.pic.setPixmap(pixmap)
         except:
-            self.img = Image.open('rabochka/kot_spit.jpg')
-            self.a = ImageQt(self.img)
-            self.pixmap = QPixmap.fromImage(self.a)
-            self.label.setPixmap(self.pixmap)
+            img = Image.open('rabochka/kot_spit.jpg')
+            img_clone = ImageQt(img)
+            pixmap = QPixmap.fromImage(img_clone)
+            self.pic.setPixmap(pixmap)
 
-    def text_v_menu(self):
-        global id, lvl, logiin, password, namee
+    def text_in_menu(self):
+        global id_null, lvl_null, login_null, password_null, name_null
 
         _translate = QtCore.QCoreApplication.translate
-        self.privet.setText(_translate('MainWindow',
+        self.hi.setText(_translate('MainWindow',
                                        f'<html><head/><body><p align="center"><span style=" font-size:24pt; '
-                                       f'font-weight:600;">Привет, {namee}!</span></p></body></html>'))
-        self.lvl.setText(_translate('MainWindow',
+                                       f'font-weight:600;">Привет, {name_null}!</span></p></body></html>'))
+        self.lvvl.setText(_translate('MainWindow',
                                     f'<html><head/><body><p><span style=" font-size:9pt; font-weight:600;'
-                                    f'">Твой уровень: {lvl}</span></p></body></html>'))
-        self.login.setText(_translate('MainWindow',
+                                    f'">Твой уровень: {lvl_null}</span></p></body></html>'))
+        self.logiin.setText(_translate('MainWindow',
                                       f'<html><head/><body><p><span style=" font-size:9pt; font-weight:600;'
-                                      f'">Твой логин: {logiin}</span></p></body></html>'))
-        if lvl < 10:
+                                      f'">Твой логин: {login_null}</span></p></body></html>'))
+        if lvl_null < 10:
             file = open('text/lvl1.txt', mode='r', encoding="utf-8")
 
-        elif lvl >= 10 and lvl < 50:
+        elif 10 <= lvl_null < 50:
             file = open('text/lvl2.txt', mode='r', encoding="utf-8")
 
-        elif lvl >= 50:
+        else:
             file = open('text/lvl3.txt', mode='r', encoding="utf-8")
 
         text_from_file = file.read()
-        self.pohvala.setText(_translate('MainWindow',
-                                        f'<html><head/><body><p><span style=" font-size:9pt; font-weight:600;'
-                                        f'">{text_from_file}</span></p></body></html>'))
+        self.praise.setText(_translate('MainWindow',
+                                       f'<html><head/><body><p><span style=" font-size:9pt; font-weight:600;'
+                                       f'">{text_from_file}</span></p></body></html>'))
 
-    def smena_password(self):
-        self.smn = Smena_prl()
-        self.smn.show()
+    def change_password(self):
+        chng = Change_password()
+        chng.show()
         self.close()
 
 
-class Smena_prl(QWidget):
+class Change_password(QWidget):
     def __init__(self):
         super().__init__()
         uic.loadUi('designs/chng.ui', self)
 
-        self.sohr.clicked.connect(self.change_password)
+        self.save.clicked.connect(self.change_password)
 
     def change_password(self):
-        if self.prl1.toPlainText() == self.prl2.toPlainText():
+        if self.pswrd1.toPlainText() == self.pswrd2.toPlainText():
             conn = sqlite3.connect('rabochka/persons.db')
             cur = conn.cursor()
 
-            if self.prl1.toPlainText() == '' or self.prl2.toPlainText() == '':
+            if self.pswrd1.toPlainText() == '' or self.pswrd2.toPlainText() == '':
                 QMessageBox.critical(self, "А ты шутник", "Вы ничего не ввели в поле", QMessageBox.Ok)
 
             else:
-                cur.execute(f'''UPDATE users SET parol = {self.prl2.toPlainText()} WHERE idshka = {id}''')
+                cur.execute(f'''UPDATE users SET parol = {self.pswrd2.toPlainText()} WHERE idshka = {id_null}''')
                 conn.commit()
 
                 QMessageBox.critical(self, "Готово!", "Пароль был изменен", QMessageBox.Ok)
 
-                self.mnu = Menu()
-                self.mnu.show()
+                menu = Menu()
+                menu.show()
                 self.close()
         else:
             QMessageBox.critical(self, "Упс!", "Пароли не совпадают", QMessageBox.Ok)
@@ -144,20 +154,29 @@ class Smena_prl(QWidget):
 class Registr(QWidget):
     def __init__(self):
         super().__init__()
+
+        self.login = None
+        self.name = None
+        self.ok = None
+        self.backk = None
+        self.paswrd = None
+        self.paswrd_2 = None
+
         uic.loadUi('designs/regg.ui', self)
 
-        self.okk.clicked.connect(self.registr_polzv)
-        self.buttonNazad.clicked.connect(self.nazad)
+        self.ok.clicked.connect(self.user_reg)
+        self.backk.clicked.connect(self.back)
 
-        self.oss = Osnova()
+        self.main = Main()
 
-    def nazad(self):
-        self.oss.mem()
+    def back(self):  # Вернуться назад
+        self.main.login()
         self.close()
 
-    def registr_polzv(self):
-        if self.prl.toPlainText() == self.prl_2.toPlainText():
-            conn = sqlite3.connect('rabochka/persons.db')
+    def user_reg(self):  # Регистрация пользователя
+        if self.paswrd.toPlainText() == self.paswrd_2.toPlainText():
+
+            conn = sqlite3.connect('rabochka/persons.db')  # База данных
             cur = conn.cursor()
             result = cur.execute(f'''SELECT idshka FROM users''').fetchall()
             logins = cur.execute(f'''SELECT login FROM users''').fetchall()
@@ -165,28 +184,29 @@ class Registr(QWidget):
             for elem in logins:
                 log.append(*elem)
 
-            if self.log.toPlainText() == '' or self.prl.toPlainText() == '' or self.name.toPlainText() == '':
+            # Проверка на наличие веденного текста в полях
+            if self.login.toPlainText() == '' or self.paswrd.toPlainText() == '' or self.name.toPlainText() == '':
                 QMessageBox.critical(self, "А ты шутник", "Вы ничего не ввели в поле", QMessageBox.Ok)
 
-            elif self.log.toPlainText() not in log:
+            elif self.login.toPlainText() not in log:
                 try:
-                    cur.execute(f'''INSERT INTO users(login,parol,idshka,name) 
-                    VALUES('{self.log.toPlainText()}','{self.prl.toPlainText()}',{int(*result[-1]) + 1},
+                    cur.execute(f'''INSERT INTO users(login,parol,idshka,name)
+                    VALUES('{self.login.toPlainText()}','{self.paswrd.toPlainText()}',{int(*result[-1]) + 1},
                      '{self.name.toPlainText()}')''')
                     cur.execute(f'''INSERT INTO levels(id,lvl) VALUES({int(*result[-1]) + 1},1)''')
                     cur.execute(f'''INSERT INTO menu(idshka,avatarka) VALUES({int(*result[-1]) + 1},'1')''')
 
                 except:
-                    cur.execute(f'''INSERT INTO users(login,parol,idshka,name) 
-                    VALUES('{self.log.toPlainText()}','{self.prl.toPlainText()}',1,'{self.name.toPlainText()}')''')
-                    cur.execute(f'''INSERT INTO levels(id,lvl) 
+                    cur.execute(f'''INSERT INTO users(login,parol,idshka,name)
+                    VALUES('{self.login.toPlainText()}','{self.paswrd.toPlainText()}',1,'{self.name.toPlainText()}')''')
+                    cur.execute(f'''INSERT INTO levels(id,lvl)
                                                     VALUES(1,1)''')
                     cur.execute(f'''INSERT INTO menu(idshka,avatarka) VALUES(1,'1')''')
 
                 QMessageBox.critical(self, "Готово!", "Поздравляю с регистрацией!", QMessageBox.Ok)
                 conn.commit()
 
-                self.oss.mem()
+                self.main.login()
                 self.close()
             else:
                 QMessageBox.critical(self, "Кудааааа", "Такой пользователь уже есть!", QMessageBox.Ok)
@@ -197,215 +217,247 @@ class Registr(QWidget):
 class Loginn(QWidget):
     def __init__(self):
         super().__init__()
+
+        self.login = None
+        self.regist = None
+        self.main = None
+        self.loginn = None
+        self.passwordd = None
+
         uic.loadUi('designs/log.ui', self)
 
-    def proverka(self):
-        global id, lvl, logiin, password, namee
+        self.login.clicked.connect(self.checck)
 
-        conn = sqlite3.connect('rabochka/persons.db')
+
+    def checck(self):
+        global id_null, lvl_null, login_null, password_null, name_null
+
+        conn = sqlite3.connect('rabochka/persons.db')  # База данных
         cur = conn.cursor()
         logins = cur.execute(f'''SELECT login FROM users''').fetchall()
-        prls = cur.execute(f'''SELECT login,parol FROM users''').fetchall()
-        idd = cur.execute(f'''SELECT idshka FROM users''').fetchall()
+        passwords = cur.execute(f'''SELECT login,parol FROM users''').fetchall()
+        ids = cur.execute(f'''SELECT idshka FROM users''').fetchall()
         names = cur.execute(f'''SELECT name FROM users''').fetchall()
         lvls = cur.execute(f'''SELECT lvl FROM levels''').fetchall()
         log = []
         for elem in logins:
             log.append(*elem)
 
-        if self.loginn.toPlainText() not in log:
+        if self.loginn.toPlainText() not in log:  # Проверка на наличие веденных данных в базе
             QMessageBox.critical(self, "Кудааааа", "Такого пользователя нет", QMessageBox.Ok)
 
-        elif (self.loginn.toPlainText(), self.paroll.toPlainText()) not in prls:
+        elif (self.loginn.toPlainText(), self.passwordd.toPlainText()) not in passwords:
             QMessageBox.critical(self, "Кудааааа", "Пароль не правильный)))", QMessageBox.Ok)
 
-        elif (self.loginn.toPlainText(), self.paroll.toPlainText()) in prls:
-            self.oss = Osnova()
+        elif (self.loginn.toPlainText(), self.passwordd.toPlainText()) in passwords:  # Вход в аккаунт
+            self.main = Main()
 
-            id = idd[prls.index((self.loginn.toPlainText(), self.paroll.toPlainText()))][0]
-            lvl = lvls[prls.index((self.loginn.toPlainText(), self.paroll.toPlainText()))][0]
-
-            logiin = self.loginn.toPlainText()
-            password = self.paroll.toPlainText()
-            namee = names[prls.index((self.loginn.toPlainText(), self.paroll.toPlainText()))][0]
+            id_null = ids[passwords.index((self.loginn.toPlainText(), self.passwordd.toPlainText()))][0]
+            lvl_null = lvls[passwords.index((self.loginn.toPlainText(), self.passwordd.toPlainText()))][0]
+            login_null = self.loginn.toPlainText()
+            password_null = self.passwordd.toPlainText()
+            name_null = names[passwords.index((self.loginn.toPlainText(), self.passwordd.toPlainText()))][0]
 
             self.close()
-            self.oss.show()
+            self.main.show()
 
 
-class Shbln(QWidget):
+class Library(QWidget):
     def __init__(self):
         super().__init__()
+
+        self.choose = None
+
         uic.loadUi('designs/sbl.ui', self)
 
-        self.osn = Osnova()
+        self.main = Main()
 
-        self.button.clicked.connect(self.vibor)
+        self.choose.clicked.connect(self.choose_mem)
 
         self.flag = False
 
-    def vibor(self):
-        self.f1 = self.radioButton_1.isChecked()
-        self.f2 = self.radioButton_2.isChecked()
-        self.f3 = self.radioButton_3.isChecked()
-        self.f4 = self.radioButton_4.isChecked()
-        self.f5 = self.radioButton_5.isChecked()
-        self.f6 = self.radioButton_6.isChecked()
+    def choose_mem(self):
+        self.f1 = self.pic1.isChecked()
+        self.f2 = self.pic2.isChecked()
+        self.f3 = self.pic3.isChecked()
+        self.f4 = self.pic4.isChecked()
+        self.f5 = self.pic5.isChecked()
+        self.f6 = self.pic6.isChecked()
 
         if self.f1:
-            self.osn.shbln_pic = 'sbln/1.jpg'
+            self.main.lib_pic = 'sbln/1.jpg'
             self.flag = True
         elif self.f2:
-            self.osn.shbln_pic = 'sbln/2.jpg'
+            self.main.lib_pic = 'sbln/2.jpg'
             self.flag = True
         elif self.f3:
-            self.osn.shbln_pic = 'sbln/3.jpg'
+            self.main.lib_pic = 'sbln/3.jpg'
             self.flag = True
         elif self.f4:
-            self.osn.shbln_pic = 'sbln/4.jpg'
+            self.main.lib_pic = 'sbln/4.jpg'
             self.flag = True
         elif self.f5:
-            self.osn.shbln_pic = 'sbln/5.jpg'
+            self.main.lib_pic = 'sbln/5.jpg'
             self.flag = True
         elif self.f6:
-            self.osn.shbln_pic = 'sbln/6.jpg'
+            self.main.lib_pic = 'sbln/6.jpg'
             self.flag = True
 
         else:
             QMessageBox.critical(self, "Эм", "Вы не выбрали шаблон", QMessageBox.Ok)
 
         if self.flag:
-            self.osn.show()
-            self.osn.flag_for_shln = True
-            self.osn.vstavka_pic()
+            self.main.show()
+            self.main.flag_for_template = True
+            self.main.paste_pic()
             self.close()
 
 
-class Osnova(QMainWindow):
+class Main(QMainWindow):
     def __init__(self):
         super().__init__()
-        uic.loadUi('designs/osn.ui', self)
+
+        self.demotivator = None
+        self.name2 = "None"
+        self.name1 = "None"
+        self.paste_pic = None
+        self.save = None
+        self.degree_pic = None
+        self.size_pic = None
+        self.visibility = None
+        self.save_action = None
+        self.button_ok = None
+        self.degree_text = None
+        self.size_text = None
+        self.paste_text = None
+        self.library = None
+        self.pic = None
+        self.meme = None
+        self.logg = None
+        self.regg = None
+        self.intro = None
+        self.lib_pic = None
+
+        uic.loadUi('designs/main.ui', self)
 
         self.conn = sqlite3.connect('rabochka/persons.db')
         self.cur = self.conn.cursor()
 
-        self.kartinka.clicked.connect(self.vstavka_pic)
-        self.bibl.clicked.connect(self.show_sbl)
-        self.vst_text.clicked.connect(self.spros_text)
-        self.vst_pic.clicked.connect(self.spros_pic)
-        self.ramka.clicked.connect(self.mem_ramka_text_zagolovok)
-        self.sohranit.clicked.connect(self.sohr)
-        self.flag_ok.clicked.connect(self.flagok)
-        self.menu.clicked.connect(self.menu_open)
+        self.pic.clicked.connect(self.choose_pic)
+        self.library.clicked.connect(self.show_library)
+        self.paste_text.clicked.connect(self.ask_text)
+        self.paste_pic.clicked.connect(self.ask_pic)
+        self.demotivator.clicked.connect(self.create_demotivator)
+        self.save.clicked.connect(self.save_meme)
+        self.save_action.clicked.connect(self.flagok)
+        self.menu.clicked.connect(self.show_menu)
 
-        self.flag_ok.hide()
+        self.save_action.hide()
 
         self.x1 = 30
         self.y1 = 30
-        self.flag = True
-        self.flag_1 = True
-        self.flag_2 = True
-        self.flag_deistv = True
+        self.flag_text = True
+        self.flag_pic = True
+        self.flag_dmtvtr = True
+        self.flag_action = True
 
-        self.razmer.valueChanged[int].connect(self.changeValue)
-        self.size_text = 18
+        # Функции для редактирования текста
+        self.size_text.valueChanged[int].connect(self.change_size_text)
+        self.size_text_null = 18
 
-        self.razmer_2.valueChanged[int].connect(self.changeValue_1)
-        self.size_pic = 40
+        self.degree_text.valueChanged[int].connect(self.change_degree_text)
+        self.degree_text_null = 0
 
-        self.gradus.valueChanged[int].connect(self.sliderMoved)
-        self.grds_pic = 0
+        self.font.currentTextChanged.connect(self.change_font)
+        self.font_null = 'Arial.ttf'
 
-        self.gradus_2.valueChanged[int].connect(self.sliderMoved_1)
-        self.grds_txt = 0
+        # Функции для редактирования картинок
+        self.size_pic.valueChanged[int].connect(self.change_size_pic)
+        self.size_pic_null = 40
 
-        self.prozrach.valueChanged.connect(self.prozr)
-        self.prozrachnost = 255
+        self.degree_pic.valueChanged[int].connect(self.change_degree_pic)
+        self.degree_pic_null = 0
 
-        self.shrift.currentTextChanged.connect(self.srft_changed)
-        self.shrft = 'Arial.ttf'
+        self.visibility.valueChanged.connect(self.change_visibility)
+        self.visibility_null = 255
 
         self.flag_for_combbox = True
-        self.flag_for_shln = False
+        self.flag_for_template = False
 
-    def menu_open(self):
-        self.menu = Menu()
-        self.menu.show()
+    def flagok(self):
+        self.flag_text = True
+        self.flag_pic = True
+        if self.flag_dmtvtr is False:
+            self.flag_dmtvtr = True
+            self.width, self.height = self.img.size
+        self.flag_action = True
+        self.button_ok.hide()
+        self.save_action.show()
+        try:
+            self.img = self.back.copy()
+        except:
+            None
 
     def combbox(self):
-        global lvl
+        global lvl_null
+        listt = []
 
-        spisok = []
         for (dirpath, dirnames, filenames) in walk('shrifts/'):
-            spisok.extend(filenames)
+            listt.extend(filenames)
             break
 
         if self.flag_for_combbox:
-            if lvl < 10:
-                self.shrift.addItems(spisok[:3])
+            if lvl_null < 10:
+                self.font.addItems(listt[:3])
                 self.flag_for_combbox = False
-            elif lvl >= 10 and lvl < 50:
-                self.shrift.addItems(spisok[:6])
+            elif lvl_null >= 10 and lvl_null < 50:
+                self.font.addItems(listt[:6])
                 self.flag_for_combbox = False
             else:
-                self.shrift.addItems(spisok[:15])
+                self.font.addItems(listt[:15])
                 self.flag_for_combbox = False
-
-    def flagok(self):
-        self.flag = True
-        self.flag_1 = True
-        if self.flag_2 is False:
-            self.flag_2 = True
-            self.width, self.height = self.img.size
-        self.flag_deistv = True
-        self.flag_ok.hide()
-        self.sohranit.show()
-        try:
-            self.img = self.nazd.copy()
-        except:
-            None
 
     def mousePressEvent(self, event):
         self.x1 = event.x()
         self.y1 = event.y()
-        if self.flag is False:
-            self.vstav_text()
-        if self.flag_1 is False:
-            self.vstav_pic()
+        if self.flag_text is False:
+            self.pst_text()
+        if self.flag_pic is False:
+            self.pst_pic()
 
-    def sohr(self):
-        global id, lvl
+    def save_meme(self):
+        global id_null, lvl_null
 
-        nazvanie, ok = QInputDialog.getText(self, "Имя файла",
-                                            "Как назвать файл?")
+        name, ok = QInputDialog.getText(self, "Имя файла", "Как назвать файл?")
+
         try:
-            if nazvanie:
-                self.img.save(f'mem/{nazvanie}.png')
-                QMessageBox.critical(self, "Ура", f'Мем сохранен в папке .../memcreator/mem/{nazvanie}.png',
+            if name:
+                self.img.save(f'mem/{name}.png')
+                QMessageBox.critical(self, "Ура", f'Мем сохранен в папке .../memcreator/mem/{name}.png',
                                      QMessageBox.Ok)
             else:
                 self.img.save('mem/Вы_не_ввели_название.png')
                 QMessageBox.critical(self, "Ура", 'Мем сохранен в папке .../memcreator/mem/Вы_не_ввели_название.png',
                                      QMessageBox.Ok)
-            lvl += 1
+            lvl_null += 1
 
-            self.cur.execute(f'''UPDATE levels SET lvl = {lvl} WHERE id = {id}''')
+            self.cur.execute(f'''UPDATE levels SET lvl = {lvl_null} WHERE id = {id_null}''')
             self.conn.commit()
             _translate = QtCore.QCoreApplication.translate
         except:
             _translate = QtCore.QCoreApplication.translate
-            self.label.setText(_translate("MainWindow",
-                                          "<html><head/><body><p align=\"center\"><span style=\" font-size:12pt; \
-                                           font-weight:600;\">Ой, нет мема! Нечего сохранять</span></p></body></html>"))
+            self.meme.setText(_translate("MainWindow",
+                                         "<html><head/><body><p align=\"center\"><span style=\" font-size:12pt; \
+                                          font-weight:600;\">Ой, нет мема! Нечего сохранять</span></p></body></html>"))
 
-    def vstavka_pic(self):
-        global lvl, id
+    def choose_pic(self):  # Выбрать стоковую картинку для редактирования
+        global lvl_null, id_null
         try:
-            if self.flag_for_shln:
-                self.fname = self.shbln_pic
-                self.flag_for_shln = False
+            if self.flag_for_template:
+                self.fname = self.lib_pic
+                self.flag_for_template = False
 
-            elif self.flag_for_shln is False:
+            elif self.flag_for_template is False:
                 self.fname = QFileDialog.getOpenFileName(self, 'Выбрать картинку', '')[0]
 
             self.img = Image.open(self.fname)
@@ -414,249 +466,245 @@ class Osnova(QMainWindow):
             self.img.thumbnail(self.size, Image.Resampling.LANCZOS)
             self.width, self.height = self.img.size
 
-            self.a = ImageQt(self.img)
-            self.pixmap = QPixmap.fromImage(self.a)
-            self.label.setPixmap(self.pixmap)
+            self.img_clone = ImageQt(self.img)
+            self.pixmap = QPixmap.fromImage(self.img_clone)
+            self.meme.setPixmap(self.pixmap)
         except:
             _translate = QtCore.QCoreApplication.translate
-            self.label.setText(_translate("MainWindow",
-                                          "<html><head/><body><p align=\"center\"><span style=\" font-size:12pt; \
-                                           font-weight:600;\">Вы не выбрали картинку!</span></p></body></html>"))
+            self.meme.setText(_translate("MainWindow",
+                                         "<html><head/><body><p align=\"center\"><span style=\" font-size:12pt; \
+                                          font-weight:600;\">Вы не выбрали картинку!</span></p></body></html>"))
 
-    def spros_text(self):
-        if self.flag_deistv:
+    def ask_text(self):  # Получение текста
+        if self.flag_action:
             self.text_mem, self.ok_pressed = QInputDialog.getText(self, "Текст", "Введите текст")
-
             self.combbox()
-            self.vstav_text()
+            self.pst_text()
         else:
-            QMessageBox.critical(self, "Ой, ошибка ", "Ты забыл закончить предыдущее действие, бака", QMessageBox.Ok)
+            QMessageBox.critical(self, "Ой, ошибка ", "Ты забыл закончить предыдущее действие, бака",
+                                 QMessageBox.Ok)
 
-    def changeValue(self, value):
-        if self.flag is False:
-            self.size_text = (value + 1) * 4
+    def change_size_text(self, value):  # Изменение размера текста
+        if self.flag_text is False:
+            self.size_text_null = (value + 1) * 4
+            self.pst_text()
 
-            self.vstav_text()
+    def change_degree_text(self):  # Изменение градуса наклона текста
+        if self.flag_text is False:
+            self.degree_text_null = 360 - int(self.degree_text.value())
+            self.pst_text()
 
-    def sliderMoved_1(self):
-        if self.flag is False:
-            self.grds_txt = 360 - int(self.gradus_2.value())
+    def change_font(self):  # Изменение шрифта текста
+        if self.flag_text is False:
+            self.font_null = str(self.font.currentText())
+            self.pst_text()
 
-            self.vstav_text()
-
-    def srft_changed(self, ):
-        if self.flag is False:
-            self.shrft = str(self.shrift.currentText())
-
-            self.vstav_text()
-
-    def vstav_text(self):
+    def pst_text(self):  # Внесение изменений (работа текста)
         if self.ok_pressed:
             try:
-                self.nazd = self.img.copy()  # self.nazd - типо назад (назд)
+                self.back = self.img.copy()  # Копия
 
                 name = self.text_mem
 
-                self.font = ImageFont.truetype(font=f'shrifts/{self.shrft}', size=self.size_text)
-                line_height = sum(self.font.getmetrics())
+                font = ImageFont.truetype(font=f'shrifts/{self.font_null}', size=self.size_text_null)
+                line_height = sum(font.getmetrics())
 
-                fontimage = Image.new('L', (self.font.getsize(name)[0], line_height))
+                fontimage = Image.new('L', (font.getsize(name)[0], line_height))
                 x, y = fontimage.size
                 ImageDraw.Draw(fontimage).text((0, 0), name, fill=255, font=self.font)
-                fontimage = fontimage.rotate(self.grds_txt, resample=Image.BICUBIC, expand=True)
+                fontimage = fontimage.rotate(self.degree_text_null, resample=Image.BICUBIC, expand=True)
 
                 x = self.x1 - 30 - (x // 2)
                 y = self.y1 - 30 - ((400 - self.height) // 2) - (y // 2)
 
-                self.flag_ok.show()
-                self.sohranit.hide()
+                self.button_ok.show()
+                self.save_action.hide()
 
                 for i in range(3):
-                    self.nazd.paste((0, 0, 0), (x - i, y), mask=fontimage)
-                    self.nazd.paste((0, 0, 0), (x + i, y), mask=fontimage)
-                    self.nazd.paste((0, 0, 0), (x, y + i), mask=fontimage)
-                    self.nazd.paste((0, 0, 0), (x, y - i), mask=fontimage)
-                    self.nazd.paste((0, 0, 0), (x - i, y + i), mask=fontimage)
-                    self.nazd.paste((0, 0, 0), (x + i, y + i), mask=fontimage)
-                    self.nazd.paste((0, 0, 0), (x - i, y - i), mask=fontimage)
-                    self.nazd.paste((0, 0, 0), (x + i, y - i), mask=fontimage)
-                self.nazd.paste((255, 255, 255), (x, y), mask=fontimage)
+                    self.back.paste((0, 0, 0), (x - i, y), mask=fontimage)
+                    self.back.paste((0, 0, 0), (x + i, y), mask=fontimage)
+                    self.back.paste((0, 0, 0), (x, y + i), mask=fontimage)
+                    self.back.paste((0, 0, 0), (x, y - i), mask=fontimage)
+                    self.back.paste((0, 0, 0), (x - i, y + i), mask=fontimage)
+                    self.back.paste((0, 0, 0), (x + i, y + i), mask=fontimage)
+                    self.back.paste((0, 0, 0), (x - i, y - i), mask=fontimage)
+                    self.back.paste((0, 0, 0), (x + i, y - i), mask=fontimage)
+                self.back.paste((255, 255, 255), (x, y), mask=fontimage)
 
-                self.a = ImageQt(self.nazd)
-                self.pixmap = QPixmap.fromImage(self.a)
-                self.label.setPixmap(self.pixmap)
+                img_clone = ImageQt(self.back)
+                pixmap = QPixmap.fromImage(img_clone)
+                self.meme.setPixmap(pixmap)
 
-                self.flag = False
-                self.flag_deistv = False
+                self.flag_text = False
+                self.flag_action = False
             except:
                 _translate = QtCore.QCoreApplication.translate
-                self.label.setText(_translate("MainWindow",
-                                              "<html><head/><body><p align=\"center\"><span style=\" font-size:12pt; \
-                                               font-weight:600;\">Вы не выбрали картинку!</span></p></body></html>"))
+                self.meme.setText(_translate("MainWindow",
+                                             "<html><head/><body><p align=\"center\"><span style=\" font-size:12pt; \
+                                              font-weight:600;\">Вы не выбрали картинку!</span></p></body></html>"))
 
-    def spros_pic(self):
-        if self.flag_deistv:
+    def ask_pic(self):
+        if self.flag_action:
             self.fname_1 = QFileDialog.getOpenFileName(self, 'Выбрать картинку', '')[0]
-
-            self.vstav_pic()
+            self.pst_pic()
         else:
-            QMessageBox.critical(self, "Ой, ошибка ", "Ты забыл закончить предыдущее действие, бака", QMessageBox.Ok)
+            QMessageBox.critical(self, "Ой, ошибка ", "Ты забыл закончить предыдущее действие, бака",
+                                 QMessageBox.Ok)
 
-    def changeValue_1(self, value):
-        if self.flag_1 is False:
-            self.size_pic = (value + 1) * 4
+    def change_size_pic(self, value):
+        if self.flag_pic is False:
+            self.size_pic_null = (value + 1) * 4
+            self.pst_pic()
 
-            self.vstav_pic()
+    def change_degree_pic(self):
+        if self.flag_pic is False:
+            self.degree_pic_null = 360 - int(self.degree_pic.value())
+            self.pst_pic()
 
-    def sliderMoved(self):
-        if self.flag_1 is False:
-            self.grds_pic = 360 - int(self.gradus.value())
+    def change_visibility(self):
+        if self.flag_pic is False:
+            self.visibility_null = int(self.visibility.value())
+            self.pst_pic()
 
-            self.vstav_pic()
-
-    def prozr(self):
-        if self.flag_1 is False:
-            self.prozrachnost = int(self.prozrach.value())
-
-            self.vstav_pic()
-
-    def vstav_pic(self):
+    def pst_pic(self):
         try:
-            self.nazd = self.img.copy()
+            self.back = self.img.copy()
+            pic = Image.open(self.fname_1)
 
-            self.pic = Image.open(self.fname_1)
+            size_1 = self.size_pic, self.size_pic
+            pic.thumbnail(size_1, Image.Resampling.LANCZOS)
 
-            self.size_1 = self.size_pic, self.size_pic
-            self.pic.thumbnail(self.size_1, Image.Resampling.LANCZOS)
+            pic = pic.rotate(self.degree_pic_null, resample=Image.Resampling.BICUBIC, expand=True,
+                             fillcolor=(0, 0, 255))
 
-            self.pic = self.pic.rotate(self.grds_pic, resample=Image.Resampling.BICUBIC, expand=True,
-                                       fillcolor=(0, 0, 255))
-
-            rgba = self.pic.convert("RGBA")
+            rgba = pic.convert("RGBA")
             dat = rgba.getdata()
-            newData = []
+            newdata = []
             for item in dat:
                 if item[0] == 0 and item[1] == 0 and item[2] == 255:
-                    newData.append((255, 255, 255, 0))
+                    newdata.append((255, 255, 255, 0))
                 else:
-                    newData.append((item[0], item[1], item[2], self.prozrachnost))
-            rgba.putdata(newData)
+                    newdata.append((item[0], item[1], item[2], self.visibility_null))
+            rgba.putdata(newdata)
             rgba.save("rabochka/transparent_image.png", "PNG")
 
-            self.pic = Image.open('rabochka/transparent_image.png', 'r')
+            pic = Image.open('rabochka/transparent_image.png', 'r')
 
-            width, height = self.pic.size
+            width, height = pic.size
             x = self.x1 - 30 - (width // 2)
             y = self.y1 - 30 - ((400 - self.height) // 2) - (height // 2)
             coord = (x, y)
 
-            self.flag_ok.show()
-            self.sohranit.hide()
+            self.button_ok.show()
+            self.save_action.hide()
 
-            self.nazd.paste(self.pic, coord, mask=self.pic)
+            self.back.paste(pic, coord, mask=self.pic)
 
-            self.a = ImageQt(self.nazd)
-            self.pixmap = QPixmap.fromImage(self.a)
-            self.label.setPixmap(self.pixmap)
+            img_clone = ImageQt(self.back)
+            pixmap = QPixmap.fromImage(img_clone)
+            self.meme.setPixmap(pixmap)
 
-            self.flag_1 = False
-            self.flag_deistv = False
+            self.flag_pic = False
+            self.flag_action = False
 
             os.remove("rabochka/transparent_image.png")
         except:
             _translate = QtCore.QCoreApplication.translate
-            self.label.setText(_translate("MainWindow",
-                                          "<html><head/><body><p align=\"center\"><span style=\" font-size:12pt; \
-                                           font-weight:600;\">Вы не выбрали картинку!</span></p></body></html>"))
+            self.meme.setText(_translate("MainWindow",
+                                         "<html><head/><body><p align=\"center\"><span style=\" font-size:12pt; \
+                                          font-weight:600;\">Вы не выбрали картинку!</span></p></body></html>"))
 
-    def mem_ramka_text_zagolovok(self):
-        if self.flag_deistv:
-            self.zag_ramk, o = QInputDialog.getText(self, "Введите заголовок", "пиши")
-
-            self.mem_ramka_text()
+    def create_demotivator(self):
+        if self.flag_action:
+            self.name1, o = QInputDialog.getText(self, "Введите заголовок", "пиши")
+            self.create_demotivator_step2()
         else:
             QMessageBox.critical(self, "Ой, ошибка ", "Ты забыл закончить предыдущее действие, бака", QMessageBox.Ok)
 
-    def mem_ramka_text(self):
-        if self.flag_deistv:
-            self.text_ramk, o = QInputDialog.getText(self, "Текст", "Введите текст")
-
-            self.mem_ramka()
+    def create_demotivator_step2(self):
+        if self.flag_action:
+            self.name2, o = QInputDialog.getText(self, "Текст", "Введите текст")
+            self.create_demotivator_step3()
         else:
             QMessageBox.critical(self, "Ой, ошибка ", "Ты забыл закончить предыдущее действие, бака", QMessageBox.Ok)
 
-    def mem_ramka(self):
+    def create_demotivator_step3(self):
         try:
             width, height = self.img.size
 
             font = ImageFont.truetype(f'shrifts/Times_new_roman.ttf', size=30)
             line_height1 = sum(font.getmetrics())
-            fontimage1 = Image.new('L', (font.getsize(self.zag_ramk)[0], line_height1))
+            fontimage1 = Image.new('L', (font.getsize(self.name1)[0], line_height1))
             x, y = fontimage1.size
-            ImageDraw.Draw(fontimage1).text((0, 0), self.zag_ramk, fill=255, font=font)
+            ImageDraw.Draw(fontimage1).text((0, 0), self.name1, fill=255, font=font)
 
             font1 = ImageFont.truetype(f'shrifts/Arial.ttf', size=15)
             line_height = sum(font1.getmetrics())
-            fontimage = Image.new('L', (font1.getsize(self.text_ramk)[0], line_height))
+            fontimage = Image.new('L', (font1.getsize(self.name2)[0], line_height))
             x1, y1 = fontimage.size
-            ImageDraw.Draw(fontimage).text((0, 0), self.text_ramk, fill=255, font=font1)
+            ImageDraw.Draw(fontimage).text((0, 0), self.name2, fill=255, font=font1)
 
-            self.ramka = Image.new('RGBA', (width + 50, height + 10 + y + 15 + y1 + 40), 'black')
-            idraw = ImageDraw.Draw(self.ramka)
+            dmtvtr = Image.new('RGBA', (width + 50, height + 10 + y + 15 + y1 + 40), 'black')
+            idraw = ImageDraw.Draw(dmtvtr)
 
             idraw.rectangle((20, 20, width + 30, height + 30), fill='white')
             idraw.rectangle((23, 23, width + 27, height + 27), fill='black')
 
-            self.ramka.paste((255, 255, 255), ((width + 50 - x) // 2, (height + 40)),
-                             mask=fontimage1)
-            self.ramka.paste((255, 255, 255), ((width + 50 - x1) // 2, (height + 40 + y + 10)),
-                             mask=fontimage)
-            self.ramka.paste(self.img, (25, 25))
+            dmtvtr.paste((255, 255, 255), ((width + 50 - x) // 2, (height + 40)),
+                         mask=fontimage1)
+            dmtvtr.paste((255, 255, 255), ((width + 50 - x1) // 2, (height + 40 + y + 10)),
+                         mask=fontimage)
+            dmtvtr.paste(self.img, (25, 25))
 
-            self.ramka.thumbnail(self.size, Image.Resampling.LANCZOS)
+            dmtvtr.thumbnail(self.size, Image.Resampling.LANCZOS)
 
-            self.flag_ok.show()
-            self.sohranit.hide()
+            self.button_ok.show()
+            self.save_action.hide()
 
-            self.flag_deistv = False
-            self.flag_2 = False
+            self.flag_action = False
+            self.flag_dmtvtr = False
 
-            self.nazd = self.ramka.copy()
+            self.back = dmtvtr.copy()
 
-            self.a = ImageQt(self.nazd)
-            self.pixmap = QPixmap.fromImage(self.a)
-            self.label.setPixmap(self.pixmap)
+            img_copy = ImageQt(self.back)
+            pixmap = QPixmap.fromImage(img_copy)
+            self.meme.setPixmap(pixmap)
         except:
             _translate = QtCore.QCoreApplication.translate
-            self.label.setText(_translate("MainWindow",
-                                          "<html><head/><body><p align=\"center\"><span style=\" font-size:12pt; \
-                                           font-weight:600;\">Вы не выбрали картинку!</span></p></body></html>"))
+            self.meme.setText(_translate("MainWindow",
+                                         "<html><head/><body><p align=\"center\"><span style=\" font-size:12pt; \
+                                          font-weight:600;\">Вы не выбрали картинку!</span></p></body></html>"))
 
-    def show_sbl(self):
-        self.k = Shbln()
+    def show_menu(self):
+        self.menu = Menu()
+        self.menu.show()
 
-        self.k.show()
+    def show_library(self):
+        self.lib = Library()
+
+        self.lib.show()
         self.close()
 
-    def show_zst(self):
-        self.w = Zastavka()
+    def show_intro(self):  # Показ начального экрана (заставка, интро)
+        self.intro = Intro()
 
-        self.w.pushButton.clicked.connect(self.w.close)
-        self.w.pushButton.clicked.connect(self.mem)
-        self.w.show()
+        self.intro.pushButton.clicked.connect(self.intro.close)  # Реакции на нажатие кнопок
+        self.intro.pushButton.clicked.connect(self.login)  # При нажатии кнопки открывает логин
 
-    def mem(self):
-        self.osn = Loginn()
+        self.intro.show()
+
+    def login(self):
+        self.logg = Loginn()
         self.regg = Registr()
 
-        self.osn.regist.clicked.connect(self.regg.show)
-        self.osn.regist.clicked.connect(self.osn.close)
-        self.osn.voity.clicked.connect(self.osn.proverka)
-        self.osn.show()
+        self.logg.regist.clicked.connect(self.regg.show)  # Реакции на нажатие кнопок
+        self.logg.regist.clicked.connect(self.logg.close)
+
+        self.logg.show()
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # Запуск приложения
     app = QApplication(sys.argv)
-    ex = Osnova()
-    ex.show_zst()
+    ex = Main()
+    ex.show_intro()
     sys.exit(app.exec_())

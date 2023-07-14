@@ -25,7 +25,7 @@
   <property name="windowTitle">
    <string>change password</string>
   </property>
-  <widget class="QTextEdit" name="prl1">
+  <widget class="QTextEdit" name="pswrd1">
    <property name="geometry">
     <rect>
      <x>65</x>
@@ -61,7 +61,7 @@
     <string>повторите пароль</string>
    </property>
   </widget>
-  <widget class="QTextEdit" name="prl2">
+  <widget class="QTextEdit" name="pswrd2">
    <property name="geometry">
     <rect>
      <x>65</x>
@@ -71,7 +71,7 @@
     </rect>
    </property>
   </widget>
-  <widget class="QPushButton" name="sohr">
+  <widget class="QPushButton" name="save">
    <property name="geometry">
     <rect>
      <x>65</x>
